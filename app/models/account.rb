@@ -6,7 +6,6 @@ class Account < ApplicationRecord
   validates :email, presence: true, uniqueness: true, length: { maximum: 255 }
   validates :nickname, presence: true, length: { maximum: 50 }
   validates :self_introduction, length: { maximum: 500 }
-  validates :admin, presence: true
   enum region: Region.regions, _prefix: true
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
