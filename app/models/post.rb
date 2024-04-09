@@ -11,4 +11,6 @@ class Post < ApplicationRecord
   enum region: Region.regions
   enum prefecture: Prefecture.prefectures, _prefix: true
   enum genre: %i(注意 駐車場 路面 事故 工事 通行止め)
+
+  scope :in_reverse_created_date_order, -> () {order(created_at: "DESC")}
 end

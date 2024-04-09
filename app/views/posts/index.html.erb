@@ -1,0 +1,33 @@
+<h1><%= t('.title') %></h1>
+<section class="timeline">
+  <% @posts.each do |post| %>
+    <hr>
+    <div class="post">
+      <div class="post_map"></div>
+      <div class="post_content">
+        <h2><%= post.title %></h2>
+        <div>
+          <p><%= post.created_at %></p>
+          <p>@<%= post.account.name %></p>
+        </div>
+        <div>
+          <p><%= post.genre %></p>
+          <p><%= post.region %></p>
+          <% if post.prefecture.present? %>
+            <p><%= post.prefecture %></p>
+          <% end %>
+        </div>
+        <div>
+          👍<%= post.favorites.size %>
+        </div>
+      </div>
+      <div>
+        <%= link_to t('common.show'), post_path(post.id) %>
+        <% if post.account_id == current_account.id %>
+            <%= link_to t('common.edit'), edit_post_path(post.id) %>
+            <%= link_to t('common.destroy'), post_path(post.id), method: :delete, data: {confirm: t('common.confirm_destroy')} %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</section>

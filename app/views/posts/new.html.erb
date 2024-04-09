@@ -1,0 +1,13 @@
+<h1><%= t('title') %></h1>
+<% if @post.errors.any? %>
+  <div>
+    <h2>情報の登録に失敗しました</h2>
+    <hr>
+    <ul>
+      <% @post.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+<%= render 'form', {post: @post, action: 'create-post'} %>

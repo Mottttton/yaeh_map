@@ -11,15 +11,18 @@
   <body>
     <p class="notice"><%= notice %></p>
     <p class="alert"><%= alert %></p>
-    <% if account_signed_in? %>
-      <%= link_to "アカウント", account_path(current_user.id) %>
-      <%= link_to "情報一覧", '#' %>
-      <%= link_to "タグ一覧", '#' %>
-      <%= link_to "ログアウト", destroy_user_session_path, method: :delete %>
-    <% else %>
-      <%= link_to "新規登録", new_account_registration_path %>
-      <%= link_to "ログイン", new_account_session_path %>
-    <% end %>
+    <nav>
+      <% if account_signed_in? %>
+        <%= link_to "アカウント", account_path(current_account.id) %>
+        <%= link_to "情報一覧", posts_path, id: "post-index" %>
+        <%= link_to "情報を投稿する", new_post_path, id: "create-post" %>
+        <%= link_to "タグ一覧", '#' %>
+        <%= link_to "ログアウト", destroy_account_session_path, method: :delete %>
+      <% else %>
+        <%= link_to "新規登録", new_account_registration_path %>
+        <%= link_to "ログイン", new_account_session_path %>
+      <% end %>
+    </nav>
     <%= yield %>
   </body>
 </html>

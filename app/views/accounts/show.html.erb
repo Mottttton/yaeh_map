@@ -1,0 +1,18 @@
+<h1><%= t('.title') %></h1>
+<table class='table'>
+  <thead class='thead-light'>
+    <th scope='col'><%= t('.table.name') %></th>
+    <th scope='col'><%= t('.table.nickname') %></th>
+  </thead>
+  <tbody>
+    <tr scope='row'>
+      <td><%= @account.name %></td>
+      <td><%= @account.nickname %></td>
+      <td><%= @account.region %></td>
+      <td><%= @account.self_introduction %></td>
+    </tr>
+  </tbody>
+</table>
+<% if current_account.id == @account.id  %>
+  <%= link_to t('common.edit'), edit_account_registration_path, method: :get, id: "edit-user", class: 'btn btn-primary' %>
+<% end %>
