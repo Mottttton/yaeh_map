@@ -151,7 +151,7 @@ function inputLatLng(latLng) {
   document.getElementById('lat').value = latLng.lat();
   document.getElementById('lng').value = latLng.lng();
   geocoder.geocode({location: latLng}, (results) => {
-    document.getElementById('place').value = results[0].formatted_address
+    document.getElementById('place').value = results[0].place_id
   })
 }
 window.initMap = initMap;
