@@ -1,25 +1,40 @@
-<div>地図</div>
-<h1><%= t('@post.title') %></h1>
+<h1><%= t('.title') %></h1>
 <div>
+  <div>
+    <h2><%= @post.title %></h2>
+  </div>
+  <div>
+    <iframe 
+      width="450"
+      height="250"
+      frameborder="0" style="border:0"
+      referrerpolicy="no-referrer-when-downgrade"
+      src="https://www.google.com/maps/embed/v1/place?key=<%= ENV["GOOGLE_MAPS_API_KEY"] %>&q=<%= @post.place %>"
+      allowfullscreen>
+    </iframe>
+  </div>
   <div>
     <p><%= @post.genre %></p>
     <p><%= @post.region %></p>
     <p><%= @post.prefecture %></p>
   </div>
   <div>
-    <p><%= @post.created_at %></p>
+    <p><%=  time_ago_in_words(@post.created_at) %></p>
   </div>
   <div>
     <p>@<%= @post.account.name %></p>
   </div>
   <div>
     <p>👍<%= @post.favorites.size %></p>
-    <p>Like</p>
+    <p>v(・∀・)yaeh!</p>
+  </div>
+  <div>
+    <p><%= @post.description %></p>
   </div>
 </div>
 <% if current_account.id == @post.account.id%>
   <div>
-    <%= link_to t('common.destroy'), post_path(@post.id), method: :delete, data: { confirm: t('common.confirm_destroy') } %>
-    <%= link_to t('common.edit'), edit_post_path(@post.id), method: :get %>
+    <%= link_to t('common.destroy'), post_path(@post.id), method: :delete, data: { confirm: t('common.confirm_destroy') }, id: 'destroy-post' %>
+    <%= link_to t('common.edit'), edit_post_path(@post.id), method: :get, id: 'edit-post' %>
   </div>
 <% end %>

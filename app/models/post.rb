@@ -6,7 +6,9 @@ class Post < ApplicationRecord
   validates :region, presence: true
   validates :description, presence: true
   validates :genre, presence: true
-  validates :place_id, presence: true
+  validates :place, presence: true
+  validates :latitude, presence: true
+  validates :longitude, presence: true
   validates :account_id, presence: true
   enum region: Region.regions
   enum prefecture: Prefecture.prefectures, _prefix: true

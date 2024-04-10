@@ -46,7 +46,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :region, :prefecture, :description, :genre, :place_id)
+    params.require(:post).permit(:title, :region, :prefecture, :description, :genre, :place, :latitude, :longitude)
   end
 
   def correct_post_owner

@@ -19,20 +19,23 @@ ja:
     models:
       post: 情報
     attributes:
-      post:
-        title: タイトル
-        region: 地域
-        description: 詳細
-        genre: 分類
-        place_id: 位置情報
-        created_at: 作成日時
-        tag: タグ
       account: 
         name: アカウント名
         email: メールアドレス
         password: パスワード
         password_confirmation: パスワード（確認）
         admin: 管理者権限
+      post:
+        title: タイトル
+        region: 地域
+        prefecture: 都道府県
+        description: 詳細
+        genre: 分類
+        place: 位置情報
+        latitude: 経度
+        longitude: 緯度
+        created_at: 作成日時
+        tag: タグ
       tag:
         name: タグ名
     errors:
@@ -51,9 +54,45 @@ ja:
   date:
     formats:
       default: "%Y/%m/%d"
+  datetime:
+    distance_in_words:
+      half_a_minute: "30秒前後"
+      less_than_x_seconds:
+        one:   "1秒前"
+        other: "%{count}秒前"
+      x_seconds:
+        one:   "1秒前"
+        other: "%{count}秒前"
+      less_than_x_minutes:
+        one:   "1分前"
+        other: "%{count}分前"
+      x_minutes:
+        one:   "約1分前"
+        other: "%{count}分前"
+      about_x_hours:
+        one:   "約1時間前"
+        other: "約%{count}時間前"
+      x_days:
+        one:   "1日前"
+        other: "%{count}日前"
+      about_x_months:
+        one:   "約1ヶ月前"
+        other: "約%{count}ヶ月前"
+      x_months:
+        one:   "1ヶ月前"
+        other: "%{count}ヶ月前"
+      almost_x_years:
+        one:   "１年弱前"
+        other: "%{count}年弱前"
+      about_x_years:
+        one:   "約1年前"
+        other: "約%{count}年前"
+      over_x_years:
+        one:   "1年以上前"
+        other: "%{count}年以上前"
   errors:
+    format: "%{attribute}%{message}"
     messages:
-      format: "%{attribute}%{message}"
       blank: を入力してください
       invalid: が正しくありません
       taken: はすでに使用されています
