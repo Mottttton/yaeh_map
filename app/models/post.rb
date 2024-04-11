@@ -6,9 +6,13 @@ class Post < ApplicationRecord
   validates :region, presence: true
   validates :description, presence: true
   validates :genre, presence: true
-  validates :place_id, presence: true
+  validates :place, presence: true
+  validates :latitude, presence: true
+  validates :longitude, presence: true
   validates :account_id, presence: true
   enum region: Region.regions
   enum prefecture: Prefecture.prefectures, _prefix: true
   enum genre: %i(注意 駐車場 路面 事故 工事 通行止め)
+
+  scope :in_reverse_created_date_order, -> () {order(created_at: "DESC")}
 end
