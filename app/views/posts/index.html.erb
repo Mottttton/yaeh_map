@@ -21,8 +21,8 @@
             <p><%= post.prefecture %></p>
           <% end %>
         </div>
-        <div>
-          👍<%= post.favorites.size %>
+        <div id="favorite-<%= post.id %>">
+          <%= render partial: "favorite", locals: { post: post } %>
         </div>
       </div>
       <div>
