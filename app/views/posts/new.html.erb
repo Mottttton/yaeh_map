@@ -160,10 +160,10 @@ function codeAddress(){
 }
 // 取得した位置情報を入力
 function inputLatLng(latLng) {
-  document.getElementById('lat').value = latLng.lat();
-  document.getElementById('lng').value = latLng.lng();
+  document.getElementById('post_latitude').value = latLng.lat();
+  document.getElementById('post_longitude').value = latLng.lng();
   geocoder.geocode({location: latLng}, (results) => {
-    document.getElementById('place').value = results[0].place_id;
+    document.getElementById('post_place').value = results[0].place_id;
   })
 }
 window.initMap = initMap;

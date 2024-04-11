@@ -25,16 +25,16 @@ function initMap() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
+          const pos = new google.maps.LatLng(
+            position.coords.latitude,
+            position.coords.longitude
+          );
 
           // 現在地を地図の中心に移動
           map.setCenter(pos);
 
           // 現在地の経度と緯度を入力
-          inputLocation(pos);
+          inputLatLng(pos);
         },
         () => {
           handleLocationError(true, infoWindow, map.getCenter());
@@ -45,18 +45,10 @@ function initMap() {
       handleLocationError(false, infoWindow, map.getCenter());
     }
   };
-
-  function inputLocation(position) {
-    document.getElementById('lat').value = position.lat;
-    document.getElementById('lng').value = position.lng;
-    geocoder.geocode({location: position}, (results) => {
-      document.getElementById('place').value = results[0].formatted_address
-    })
-  }
   // データベースから取得した位置情報をLatLngコンストラクタでインスタンス化
   let latLng = new google.maps.LatLng(
-    parseFloat(document.getElementById('lat').value), 
-    parseFloat(document.getElementById('lng').value)
+    parseFloat(document.getElementById('post_latitude').value), 
+    parseFloat(document.getElementById('post_longitude').value)
   )
 
   // 現在地ボタン
@@ -148,10 +140,10 @@ function codeAddress(){
 }
 // 取得した位置情報を入力
 function inputLatLng(latLng) {
-  document.getElementById('lat').value = latLng.lat();
-  document.getElementById('lng').value = latLng.lng();
+  document.getElementById('post_latitude').value = latLng.lat();
+  document.getElementById('post_longitude').value = latLng.lng();
   geocoder.geocode({location: latLng}, (results) => {
-    document.getElementById('place').value = results[0].place_id
+    document.getElementById('post_place').value = results[0].place_id
   })
 }
 window.initMap = initMap;
