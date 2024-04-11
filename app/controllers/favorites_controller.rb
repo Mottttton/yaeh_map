@@ -1,4 +1,5 @@
 class FavoritesController < ApplicationController
+
   before_action :set_post
 
   def create
