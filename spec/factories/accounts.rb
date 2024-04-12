@@ -7,7 +7,6 @@ FactoryBot.define do
     self_introduction { "はじめまして、太郎です。バイク歴10年です。" }
     password { "password" }
     admin { true }
-    confirmed_at { Date.today }
 
     trait :with_posts do
       after(:create) do |user|
@@ -25,7 +24,6 @@ FactoryBot.define do
     self_introduction { "花子です。バイク歴1年です。" }
     password { "password" }
     admin { false }
-    confirmed_at { Date.today }
 
     trait :with_posts do
       after(:create) do |user|

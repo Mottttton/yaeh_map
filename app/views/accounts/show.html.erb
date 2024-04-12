@@ -1,18 +1,24 @@
 <h1><%= t('.title') %></h1>
-<table class='table'>
-  <thead class='thead-light'>
-    <th scope='col'><%= t('.table.name') %></th>
-    <th scope='col'><%= t('.table.nickname') %></th>
-  </thead>
-  <tbody>
-    <tr scope='row'>
-      <td><%= @account.name %></td>
-      <td><%= @account.nickname %></td>
-      <td><%= @account.region %></td>
-      <td><%= @account.self_introduction %></td>
-    </tr>
-  </tbody>
-</table>
+<div>
+  <p><%= @account.nickname %>(@<%= @account.name %>)</p>
+</div>
+<div>
+  <p>お住まいの地域: <%= @account.region %></p>
+</div>
+<div>
+  <p>自己紹介</p>
+  <p><%= @account.self_introduction %></p>
+</div>
+
 <% if current_account.id == @account.id  %>
-  <%= link_to t('common.edit'), edit_account_registration_path, method: :get, id: "edit-user", class: 'btn btn-primary' %>
+  <%= link_to t('common.edit'), edit_account_path(@account.id), method: :get, id: "edit-account", class: 'btn btn-primary' %>
 <% end %>
+
+<div>
+  <h2>投稿一覧</h2>
+  <% if @account.posts == [] %>
+    <p>まだ投稿はありません</p>
+  <% else %>
+    <%= render partial: "posts/timeline", locals: { posts: @account.posts } %>
+  <% end %>
+</div>

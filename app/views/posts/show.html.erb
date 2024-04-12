@@ -22,7 +22,8 @@
     <p><%=  time_ago_in_words(@post.created_at) %></p>
   </div>
   <div>
-    <p>@<%= @post.account.name %></p>
+    <p><%= @post.account.nickname %></p>
+    <p>(<%= link_to "@#{@post.account.name}", account_path(@post.account.id), class: "account-#{@post.account.id}" %>)</p>
   </div>
   <div>
     <p>👍<%= @post.favorites.size %></p>

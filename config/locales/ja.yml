@@ -8,11 +8,11 @@ ja:
     create:
       created: アカウントを登録しました
     show:
-      title: アカウント詳細ページ
+      title: プロフィール詳細ページ
     edit:
-      title: アカウント編集ページ
+      title: プロフィール編集ページ
     update:
-      updated: アカウントを更新しました
+      updated: プロフィールを更新しました
     destroy:
       destroyed: アカウントを削除しました
   activerecord:
