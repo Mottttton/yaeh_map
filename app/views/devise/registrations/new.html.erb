@@ -4,7 +4,7 @@
   <%= render "devise/shared/error_messages", resource: resource %>
 
   <div class="field">
-    <%= f.label :name %><br />
+    <%= f.label :name %><span>半角英数字と_で入力してください</span><br />
     <%= f.text_field :name, autofocus: true, autocomplete: "name" %>
   </div>
 
@@ -13,10 +13,26 @@
     <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
   </div>
 
-   <div class="field">
+  <div class="field">
     <%= f.label :nickname %><br />
     <%= f.text_field :nickname, autofocus: true, autocomplete: "nickname" %>
   </div>
+
+  <div class="field">
+    <%= f.label :portrait %>
+    <%= f.file_field :portrait %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :region %>
+    <%= f.select :region, Post.regions.keys.map { |k| [k, k] }, {include_blank: true} %>
+  </div>
+
+  <div class="field">
+    <%= f.label :self_introduction %><br />
+    <%= f.text_area :self_introduction, autofocus: true, autocomplete: "nickname" %>
+  </div>
+
 
   <div class="field">
     <%= f.label :password %>
@@ -32,7 +48,7 @@
   </div>
 
   <div class="actions">
-    <%= f.submit t('.sign_up') %>
+    <%= f.submit t('.sign_up'), id: "create-account" %>
   </div>
 <% end %>
 
