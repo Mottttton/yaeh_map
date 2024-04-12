@@ -5,6 +5,11 @@
     <%= f.text_field :nickname %>
   </div>
 
+  <div class="field">
+    <%= f.label :portrait %>
+    <%= f.file_field :portrait %>
+  </div>
+
   <div class="form-group">
     <%= f.label :region %>
     <%= f.select :region, Post.regions.keys.map { |k| [k, k] }, {include_blank: true} %>

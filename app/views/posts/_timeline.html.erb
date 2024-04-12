@@ -10,6 +10,7 @@
         <h2><%= post.title %></h2>
         <div>
           <p><%= time_ago_in_words(post.created_at) %></p>
+          <p><%= image_tag post.account.portrait.variant(resize_to_limit: [100, 100]) if post.account.portrait.attached? %></p>
           <p><%= post.account.nickname %></p>
           (<%= link_to "@#{post.account.name}", account_path(post.account.id), class: "account-#{post.account.id}" %>)
 
