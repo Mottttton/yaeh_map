@@ -20,7 +20,7 @@ class AccountsController < ApplicationController
   private
 
   def set_account
-    @account = Account.find(params[:id])
+    @account = Account.with_attached_portrait.find(params[:id])
   end
 
   def account_params

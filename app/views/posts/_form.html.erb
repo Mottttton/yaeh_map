@@ -27,9 +27,14 @@
     <%= f.label :longitude %>
     <%= f.text_field :longitude %>
   </div>
-  <div class="form-group">
-    <%= f.label :picture %>
-    Active Storageで写真投稿機能追加する
+  <div class="field">
+    <% if post.photos.attached? %>
+      <% post.photos.each do |photo| %>
+        <%= image_tag photo, width: "100" %>
+      <% end %>
+    <% end %>
+    <%= f.label :photos %>
+    <%= f.file_field :photos, multiple: true %>
   </div>
   <div class="form-group">
     <%= f.label :tag %>

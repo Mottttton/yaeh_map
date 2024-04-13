@@ -4,7 +4,7 @@ class PostsController < ApplicationController
   before_action :correct_post_owner, only: %i(edit update destroy)
 
   def index
-    @posts = Post.all.in_reverse_created_date_order
+    @posts = Post.includes(favorites: :favoritable, account: {portrait_attachment: :blob}).with_attached_photos.in_reverse_created_date_order
   end
 
   def new
@@ -46,7 +46,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :region, :prefecture, :description, :genre, :place, :latitude, :longitude)
+    params.require(:post).permit(:title, :region, :prefecture, :description, :genre, :place, :latitude, :longitude, photos: [])
   end
 
   def correct_post_owner

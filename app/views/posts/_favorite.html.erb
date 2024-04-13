@@ -1,5 +1,5 @@
-<% if Favorite.find_by(account_id: current_account.id, favoritable_type: "Post", favoritable_id: post.id) %>
-  <%= link_to post_favorite_path(post.id, post.favorites.find_by(account_id: current_account.id).id), method: :delete, id: "fav_link-#{post.id}", class: "favorite-link delete-#{post.id}", remote: true do %>
+<% if post.favorites.pluck(:account_id).include?(current_account.id) %>
+  <%= link_to post_favorite_path(post.id, post.favorites.pluck(:id, :account_id).filter {|a| a[1] == current_account.id}[0][0]), method: :delete, id: "fav_link-#{post.id}", class: "favorite-link delete-#{post.id}", remote: true do %>
     <i class="material-icons">star</i>
   <% end %>
 <% else %>

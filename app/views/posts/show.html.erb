@@ -25,6 +25,13 @@
     <p><%= @post.account.nickname %></p>
     <p>(<%= link_to "@#{@post.account.name}", account_path(@post.account.id), class: "account-#{@post.account.id}" %>)</p>
   </div>
+  <div>
+    <% if @post.photos.attached? %>
+      <% @post.photos.each do |photo| %>
+        <%= image_tag photo.variant(resize_to_limit: [400, 300]) %>
+      <% end %>
+    <% end %>
+  </div>
   <div id="favorite-<%= @post.id %>">
     <%= render partial: "posts/favorite", locals: { post: @post } %>
   </div>
