@@ -4,7 +4,14 @@
     <div class="post">
       <div class="post_map">
         <img 
-          src="https://maps.googleapis.com/maps/api/staticmap?center=<%= post.latitude %>,<%= post.longitude %>&zoom=16&size=400x400&markers=color:red|<%= post.latitude %>,<%= post.longitude %>&key=<%= ENV["GOOGLE_MAPS_API_KEY"] %>">
+          src="https://maps.googleapis.com/maps/api/staticmap?center=<%= post.latitude %>,<%= post.longitude %>&zoom=16&size=400x300&markers=color:red|<%= post.latitude %>,<%= post.longitude %>&key=<%= ENV["GOOGLE_MAPS_API_KEY"] %>">
+      </div>
+      <div class="post_photos">
+        <% if post.photos.attached? %>
+          <% post.photos.each do |photo| %>
+            <%= image_tag photo.variant(resize_to_limit: [400, 300]) %>
+          <% end %>
+        <% end %>
       </div>
       <div class="post_content">
         <h2><%= post.title %></h2>
@@ -21,6 +28,9 @@
           <% if post.prefecture.present? %>
             <p><%= post.prefecture %></p>
           <% end %>
+        </div>
+        <div>
+          <%= post.description %>
         </div>
         <div id="favorite-<%= post.id %>">
           <%= render partial: "posts/favorite", locals: { post: post } %>
