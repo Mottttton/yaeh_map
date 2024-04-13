@@ -22,6 +22,9 @@
             <p><%= post.prefecture %></p>
           <% end %>
         </div>
+        <div>
+          <%= post.description %>
+        </div>
         <div id="favorite-<%= post.id %>">
           <%= render partial: "posts/favorite", locals: { post: post } %>
         </div>
