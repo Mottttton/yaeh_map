@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
 
+  alias_method :current_user, :current_account
+
   protected
 
   def configure_permitted_parameters

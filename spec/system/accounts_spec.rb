@@ -80,4 +80,40 @@ RSpec.describe "Accounts", type: :system do
       end
     end
   end
+  describe '管理者機能' do
+    describe '画面遷移' do
+      let!(:first_account) { FactoryBot.create(:first_account) }
+      let!(:second_account) { FactoryBot.create(:second_account) }
+      context '管理者アカウントでログイン' do
+        before do
+          visit new_account_session_path
+          fill_in('account_email', with: 'taro@sample.com')
+          fill_in('account_password', with: 'password')
+          click_button('ログイン')
+        end
+        it '管理者用ページのリンクが存在する' do
+          expect(page).to have_link('admin-index')
+        end
+        it '管理者用ページにアクセス可能' do
+          visit rails_admin_path
+          expect(page).to have_text('サイト管理')
+        end
+      end
+      context '一般アカウントでログイン' do
+        before do
+          visit new_account_session_path
+          fill_in('account_email', with: 'hanako@sample.com')
+          fill_in('account_password', with: 'password')
+          click_button('ログイン')
+        end
+        it '管理者用ページのリンクが表示されていない' do
+          expect(page).not_to have_link('admin-index')
+        end
+        it '管理者用ページにアクセスするとエラーページが表示される' do
+          visit rails_admin_path
+          expect(page).not_to have_text('サイト管理')
+        end
+      end
+    end
+  end
 end
