@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe "Accounts", type: :system do
+  include SigninMacro
+
   describe 'アカウント登録機能テスト' do
     before do
       visit new_account_registration_path
@@ -33,10 +35,7 @@ RSpec.describe "Accounts", type: :system do
         let!(:first_account) { FactoryBot.create(:first_account) }
         let!(:second_account) { FactoryBot.create(:second_account) }
         before do
-          visit new_account_session_path
-          fill_in('account_email', with: 'taro@sample.com')
-          fill_in('account_password', with: 'password')
-          click_button('ログイン')
+          signin_as(first_account)
         end
         it '情報一覧画面に遷移し、「ログインしました」というメッセージが表示される' do
           expect(page).to have_text('情報一覧ページ')
@@ -86,10 +85,7 @@ RSpec.describe "Accounts", type: :system do
       let!(:second_account) { FactoryBot.create(:second_account) }
       context '管理者アカウントでログイン' do
         before do
-          visit new_account_session_path
-          fill_in('account_email', with: 'taro@sample.com')
-          fill_in('account_password', with: 'password')
-          click_button('ログイン')
+          signin_as(first_account)
         end
         it '管理者用ページのリンクが存在する' do
           expect(page).to have_link('admin-index')
@@ -101,10 +97,7 @@ RSpec.describe "Accounts", type: :system do
       end
       context '一般アカウントでログイン' do
         before do
-          visit new_account_session_path
-          fill_in('account_email', with: 'hanako@sample.com')
-          fill_in('account_password', with: 'password')
-          click_button('ログイン')
+          signin_as(second_account)
         end
         it '管理者用ページのリンクが表示されていない' do
           expect(page).not_to have_link('admin-index')
