@@ -1,16 +1,17 @@
 RailsAdmin.config do |config|
   config.asset_source = :webpacker
+  config.parent_controller = 'ApplicationController'
 
   ### Popular gems integration
 
   ## == Devise ==
-  # config.authenticate_with do
-  #   warden.authenticate! scope: :user
-  # end
-  # config.current_user_method(&:current_user)
+  config.authenticate_with do
+    warden.authenticate! scope: :account
+  end
+  config.current_user_method(&:current_account)
 
   ## == CancanCan ==
-  # config.authorize_with :cancancan
+  config.authorize_with :cancancan
 
   ## == Pundit ==
   # config.authorize_with :pundit
