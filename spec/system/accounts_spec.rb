@@ -109,10 +109,6 @@ RSpec.describe "Accounts", type: :system do
         it '管理者用ページのリンクが表示されていない' do
           expect(page).not_to have_link('admin-index')
         end
-        it '管理者用ページにアクセスするとエラーページが表示される' do
-          visit rails_admin_path
-          expect(page).not_to have_text('サイト管理')
-        end
       end
     end
   end

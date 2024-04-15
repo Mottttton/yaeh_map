@@ -1,7 +1,11 @@
 class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
 
-  alias_method :current_user, :current_account
+  # alias_method :current_user, :current_account
+
+  rescue_from CanCan::AccessDenied do |_exception|
+    redirect_to root_url, notice: t('notice.reject')
+  end
 
   protected
 
