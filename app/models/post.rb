@@ -14,7 +14,13 @@ class Post < ApplicationRecord
   validates :photos, limit: { max: 4 }, content_type: %i(png jpg jpeg)
   enum region: Region.regions
   enum prefecture: Prefecture.prefectures, _prefix: true
-  enum genre: %i(注意 駐車場 路面 事故 工事 通行止め)
+  enum genre: {
+    オススメ: 0,
+    駐輪場: 1,
+    注意: 2
+  }
 
   scope :in_reverse_created_date_order, -> () {order(created_at: "DESC")}
+  scope :filter_by_region, -> (region) {where(region: region)}
+  scope :filter_by_account_id, -> (account_id) {where(account_id: account_id)}
 end

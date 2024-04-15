@@ -4,7 +4,11 @@ class PostsController < ApplicationController
   before_action :correct_post_owner, only: %i(edit update destroy)
 
   def index
-    @posts = Post.includes(favorites: :favoritable, account: {portrait_attachment: :blob}).with_attached_photos.in_reverse_created_date_order
+    @q = Post.ransack(params[:q])
+    @posts = @q.result(distinct: true).includes(favorites: :favoritable, account: {portrait_attachment: :blob}).with_attached_photos.in_reverse_created_date_order
+    if params[:q].nil? && current_account.region.present? # 検索していない かつ プロフィールに地域を設定している
+      @posts = @posts.filter_by_region(current_account.region).or(@posts.filter_by_account_id(current_account.id)) # ログインアカウントの地域と自身の投稿を表示
+    end # それ以外は全地域からフィルターをかける
   end
 
   def new

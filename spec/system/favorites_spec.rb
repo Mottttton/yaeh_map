@@ -1,16 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe "Favorites", type: :system do
+  include SigninMacro
 
   describe '機能要件' do
     let!(:first_account) { FactoryBot.create(:first_account, :with_posts) }
     let!(:second_account) { FactoryBot.create(:second_account, :with_posts) }
 
     before do
-      visit new_account_session_path
-      fill_in('account_email', with: 'taro@sample.com')
-      fill_in('account_password', with: 'password')
-      click_button('ログイン')
+      signin_as(first_account)
     end
     describe 'お気に入りの登録削除' do
       context '情報投稿一覧画面' do

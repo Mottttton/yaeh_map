@@ -1,2 +1,27 @@
 <h1><%= t('.title') %></h1>
+<%= search_form_for @q do |f| %>
+  <div class="field">
+    <%= f.label :title_or_description_cont, 'キーワード' %>
+    <%= f.search_field :title_or_description_cont %>
+  </div>
+  <div class="field">
+    <%= f.label :region_eq, '地域' %>
+    <%= f.select :region_eq, options_for_select(Region.regions), include_blank: true %>
+  </div>
+  <div class="field">
+    <%= f.label :prefecture_eq_any, '都道府県' %>
+    <% Prefecture.prefectures.each do |prefecture| %>
+      <%= f.check_box :prefecture_eq_any, {multiple: true, include_hidden: false}, prefecture[1] %>
+      <%= f.label prefecture[0] %>
+    <% end %>
+  </div>
+  <div class="field">
+    <%= f.label :genre %>
+    <% Post.genres.each do |genre| %>
+      <%= f.check_box :genre_eq_any, {multiple: true, include_hidden: false}, genre[1] %>
+      <%= f.label genre[0] %>
+    <% end %>
+  </div>
+  <%= f.submit %>
+<% end %>
 <%= render partial: "timeline", locals: { posts: @posts } %>
