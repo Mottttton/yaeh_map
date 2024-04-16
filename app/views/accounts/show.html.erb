@@ -12,16 +12,14 @@
   <p>自己紹介</p>
   <p><%= @account.self_introduction %></p>
 </div>
-
 <% if current_account.id == @account.id  %>
   <%= link_to t('common.edit'), edit_account_path(@account.id), method: :get, id: "edit-account", class: 'btn btn-primary' %>
 <% end %>
-
 <div>
   <h2>投稿一覧</h2>
   <% if @account.posts == [] %>
     <p>まだ投稿はありません</p>
   <% else %>
-    <%= render partial: "posts/timeline", locals: { posts: @account.posts } %>
+    <%= render partial: "posts/timeline", locals: { posts: @posts } %>
   <% end %>
 </div>
