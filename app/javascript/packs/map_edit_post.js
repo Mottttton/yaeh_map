@@ -4,33 +4,11 @@ let marker;
 let geocoder;
 let aft;
 let searchLocationBtn = document.getElementById('search-location-btn')
+const locationButton = document.getElementById("current_location");
 
-function initMap() { 
+function initEditPostMap() { 
   // 現在地への移動
-  function moveCurrentLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const pos = new google.maps.LatLng(
-            position.coords.latitude,
-            position.coords.longitude
-          );
-
-          // 現在地を地図の中心に移動
-          map.setCenter(pos);
-
-          // 現在地の経度と緯度を入力
-          inputLatLng(pos);
-        },
-        () => {
-          handleLocationError(true, infoWindow, map.getCenter());
-        }
-      );
-    } else {
-      // Browser doesn't support Geolocation
-      handleLocationError(false, infoWindow, map.getCenter());
-    }
-  };
+  
   // データベースから取得した位置情報をLatLngコンストラクタでインスタンス化
   let latLng = new google.maps.LatLng(
     parseFloat(document.getElementById('post_latitude').value), 
@@ -38,7 +16,6 @@ function initMap() {
   )
 
   // 現在地ボタン
-  const locationButton = document.getElementById("current_location");
   locationButton.addEventListener("click", moveCurrentLocation);
 
   geocoder = new google.maps.Geocoder();
@@ -54,6 +31,31 @@ function initMap() {
     placeMarkerAndPanTo(e.latLng, map);
   });
 }
+
+function moveCurrentLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const pos = new google.maps.LatLng(
+          position.coords.latitude,
+          position.coords.longitude
+        );
+
+        // 現在地を地図の中心に移動
+        map.setCenter(pos);
+
+        // 現在地の経度と緯度を入力
+        inputLatLng(pos);
+      },
+      () => {
+        handleLocationError(true, infoWindow, map.getCenter());
+      }
+    );
+  } else {
+    // Browser doesn't support Geolocation
+    handleLocationError(false, infoWindow, map.getCenter());
+  }
+};
 
 // 現在地取得時にエラーが発生した場合の処理
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -73,6 +75,12 @@ function placeMarkerAndPanTo(latLng, map) {
     marker.setMap(null);
   }
   //新しくマーカーを作成する
+  placeMarker(latLng, map);
+  
+  //検索した時に緯度経度を入力する
+  inputLatLng(latLng);
+}
+function placeMarker(latLng, map) {
   marker = new google.maps.Marker({
     map: map,
     position: latLng,
@@ -82,15 +90,13 @@ function placeMarkerAndPanTo(latLng, map) {
   //二度目以降か判断
   aft = true
 
-  //検索した時に緯度経度を入力する
-  inputLatLng(latLng);
-
   // マーカーのドロップ（ドラッグ終了）時のイベント
   google.maps.event.addListener( marker, 'dragend', e => {
     // イベントの引数evの、プロパティ.latLngが緯度経度
     inputLatLng(e.latLng)
   });
 }
+
 // 検索後のマップ作成
 function searchAddress(){
   searchLocationBtn.addEventListener("click", () => {
@@ -103,12 +109,8 @@ function searchAddress(){
         }
         //新しくマーカーを作成する
         map.setCenter(results[0].geometry.location);
-        marker = new google.maps.Marker({
-          map: map,
-          position: results[0].geometry.location,
-          draggable: true	// ドラッグ可能にする
-        });
-  
+        placeMarker(results[0].geometry.location, map)
+
         //二度目以降か判断
         aft = true
   
@@ -133,156 +135,174 @@ function inputLatLng(latLng) {
   geocoder.geocode({location: latLng}, (results) => {
     let arryLength = results[0].address_components.length;
     let pref = results[0].address_components[arryLength-3].short_name.replace('県', '').replace('府', '').replace('東京都', '東京');
-    let region
+    let region = selectRegion(pref)
     document.getElementById('post_prefecture').value = pref
-    switch (pref) {
-      case '北海道':
-        region = '北海道'
-        break;
-      case '青森':
-        region = '東北'
-        break;
-      case '岩手':
-        region = '東北'
-        break;
-      case '宮城':
-        region = '東北'
-        break;
-      case '秋田':
-        region = '東北'
-        break;
-      case '山形':
-        region = '東北'
-        break;
-      case '福島':
-        region = '東北'
-        break;
-      case '茨城':
-        region = '神奈川'
-        break;
-      case '栃木':
-        region = '神奈川'
-        break;
-      case '群馬':
-        region = '神奈川'
-        break;
-      case '埼玉':
-        region = '神奈川'
-        break;
-      case '千葉':
-        region = '神奈川'
-        break;
-      case '東京':
-        region = '神奈川'
-        break;
-      case '神奈川':
-        region = '神奈川'
-        break;
-      case '新潟':
-        region = '北陸'
-        break;
-      case '富山':
-        region = '北陸'
-        break;
-      case '石川':
-        region = '北陸'
-        break;
-      case '福井':
-        region = '北陸'
-        break;
-      case '山梨':
-        region = '東海'
-        break;
-      case '長野':
-        region = '東海'
-        break;
-      case '岐阜':
-        region = '東海'
-        break;
-      case '静岡':
-        region = '東海'
-        break;
-      case '愛知':
-        region = '東海'
-        break;
-      case '三重':
-        region = '近畿'
-        break;
-      case '滋賀':
-        region = '近畿'
-        break;
-      case '京都':
-        region = '近畿'
-        break;
-      case '大阪':
-        region = '近畿'
-        break;
-      case '兵庫':
-        region = '近畿'
-        break;
-      case '奈良':
-        region = '近畿'
-        break;
-      case '和歌山':
-        region = '近畿'
-        break;
-      case '鳥取':
-        region = '中国'
-        break;
-      case '島根':
-        region = '中国'
-        break;
-      case '岡山':
-        region = '中国'
-        break;
-      case '広島':
-        region = '中国'
-        break;
-      case '山口':
-        region = '中国'
-        break;
-      case '徳島':
-        region = '四国'
-        break;
-      case '香川':
-        region = '四国'
-        break;
-      case '愛媛':
-        region = '四国'
-        break;
-      case '高知':
-        region = '四国'
-        break;
-      case '福岡':
-        region = '鹿児島'
-        break;
-      case '佐賀':
-        region = '鹿児島'
-        break;
-      case '長崎':
-        region = '鹿児島'
-        break;
-      case '熊本':
-        region = '鹿児島'
-        break;
-      case '大分':
-        region = '鹿児島'
-        break;
-      case '宮崎':
-        region = '鹿児島'
-        break;
-      case '鹿児島':
-        region = '鹿児島'
-        break;
-      case '沖縄':
-        region = '沖縄'
-        break;
-      default:
-        region = '';
-    }
     document.getElementById('post_region').value = region;
-    document.getElementById('post_place').value = results[0].place_id
+    document.getElementById('post_place').value = results[0].place_id;
   })
 }
-window.initMap = initMap;
-window.onload = searchAddress;
+
+function selectRegion(pref) {
+  let region
+  switch (pref) {
+    case '北海道':
+      region = '北海道'
+      break;
+    case '青森':
+      region = '東北'
+      break;
+    case '岩手':
+      region = '東北'
+      break;
+    case '宮城':
+      region = '東北'
+      break;
+    case '秋田':
+      region = '東北'
+      break;
+    case '山形':
+      region = '東北'
+      break;
+    case '福島':
+      region = '東北'
+      break;
+    case '茨城':
+      region = '関東'
+      break;
+    case '栃木':
+      region = '関東'
+      break;
+    case '群馬':
+      region = '関東'
+      break;
+    case '埼玉':
+      region = '関東'
+      break;
+    case '千葉':
+      region = '関東'
+      break;
+    case '東京':
+      region = '関東'
+      break;
+    case '神奈川':
+      region = '関東'
+      break;
+    case '新潟':
+      region = '北陸'
+      break;
+    case '富山':
+      region = '北陸'
+      break;
+    case '石川':
+      region = '北陸'
+      break;
+    case '福井':
+      region = '北陸'
+      break;
+    case '山梨':
+      region = '東海'
+      break;
+    case '長野':
+      region = '東海'
+      break;
+    case '岐阜':
+      region = '東海'
+      break;
+    case '静岡':
+      region = '東海'
+      break;
+    case '愛知':
+      region = '東海'
+      break;
+    case '三重':
+      region = '近畿'
+      break;
+    case '滋賀':
+      region = '近畿'
+      break;
+    case '京都':
+      region = '近畿'
+      break;
+    case '大阪':
+      region = '近畿'
+      break;
+    case '兵庫':
+      region = '近畿'
+      break;
+    case '奈良':
+      region = '近畿'
+      break;
+    case '和歌山':
+      region = '近畿'
+      break;
+    case '鳥取':
+      region = '中国'
+      break;
+    case '島根':
+      region = '中国'
+      break;
+    case '岡山':
+      region = '中国'
+      break;
+    case '広島':
+      region = '中国'
+      break;
+    case '山口':
+      region = '中国'
+      break;
+    case '徳島':
+      region = '四国'
+      break;
+    case '香川':
+      region = '四国'
+      break;
+    case '愛媛':
+      region = '四国'
+      break;
+    case '高知':
+      region = '四国'
+      break;
+    case '福岡':
+      region = '鹿児島'
+      break;
+    case '佐賀':
+      region = '鹿児島'
+      break;
+    case '長崎':
+      region = '鹿児島'
+      break;
+    case '熊本':
+      region = '鹿児島'
+      break;
+    case '大分':
+      region = '鹿児島'
+      break;
+    case '宮崎':
+      region = '鹿児島'
+      break;
+    case '鹿児島':
+      region = '鹿児島'
+      break;
+    case '沖縄':
+      region = '沖縄'
+      break;
+    default:
+      region = '';
+  }
+  return region;
+}
+function inputRegion() {
+  const prefSelectBox = document.getElementById('post_prefecture');
+  prefSelectBox.addEventListener("change", () => {
+    let pref = prefSelectBox.value;
+    document.getElementById('post_region').value = selectRegion(pref);
+  })
+}
+
+
+
+window.initMap = initEditPostMap;
+window.onload = function() {
+  searchAddress();
+  inputRegion();
+}
