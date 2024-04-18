@@ -11,23 +11,64 @@
       rel="stylesheet">
   </head>
   <body>
-    <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
-    <nav>
-      <% if account_signed_in? %>
-        <%= link_to "アカウント", account_path(current_account.id), id: 'account-detail' %>
-        <%= link_to "情報一覧", posts_path, id: 'post-index' %>
-        <%= link_to "情報を投稿する", new_post_path, id: 'new-post' %>
-        <%= link_to "タグ一覧", '#' %>
-        <% if current_account.admin? %>
-          <%= link_to "管理者用", rails_admin_path, id: 'admin-index' %>
+    <header>
+      <nav class="navbar navbar-expand-lg bg-body-secondary fixed-top mb-5">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">Yaeh Map</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <% if account_signed_in? %>
+                <div class="nav-item">
+                  <%= link_to "アカウント", account_path(current_account.id), id: 'account-detail', class: 'nav-link' %>
+                </div>
+                <div class="nav-item">
+                  <%= link_to "情報一覧", posts_path, id: 'post-index', class: 'nav-link' %>
+                </div>
+                <div class="nav-item">
+                  <%= link_to "情報を投稿する", new_post_path, id: 'new-post', class: 'nav-link' %>
+                </div>
+                <% if current_account.admin? %>
+                  <div class="nav-item">
+                    <%= link_to "管理者用", rails_admin_path, id: 'admin-index', class: 'nav-link' %>
+                  </div>
+                <% end %>
+                <div class="nav-item">
+                  <%= link_to "ログアウト", destroy_account_session_path, method: :delete, id: 'sign-out', class: 'nav-link' %>
+                </div>
+              <% else %>
+                <div class="nav-item">
+                  <%= link_to "新規登録", new_account_registration_path, id: 'sign-up', class: 'nav-link' %>
+                </div>
+                <div class="nav-item">
+                  <%= link_to "ログイン", new_account_session_path, id: 'sign-in', class: 'nav-link' %>
+                </div>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <div id="notification">
+      <% flash.each do |key, value| %>
+        <% if key == "notice" %>
+          <%= content_tag(:div, value, id: "notice", class: "alert alert-success #{key}", role: 'alert') %>
+        <% elsif key == "danger" || "alert" %>
+          <%= content_tag(:div, value, id: "notice", class: "alert alert-danger #{key}", role: 'alert') %>
         <% end %>
-        <%= link_to "ログアウト", destroy_account_session_path, method: :delete, id: 'sign-out' %>
-      <% else %>
-        <%= link_to "新規登録", new_account_registration_path, id: 'sign-up' %>
-        <%= link_to "ログイン", new_account_session_path, id: 'sign-in' %>
       <% end %>
-    </nav>
-    <%= yield %>
+    </div>
+    <main class="container mt-5">
+      <%= yield %>
+    </main>
+    <div class="container">
+      <footer class="py-3 my-4 border-top">
+        <p class="text-center text-body-secondary">
+          &copy; Mottttton
+        </p>
+      </footer>
+    </div>
   </body>
 </html>

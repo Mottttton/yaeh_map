@@ -4,13 +4,13 @@ ja:
       new: アカウント登録
       show: アカウント設定
     new:
-      title: アカウント登録ページ
+      title: アカウント登録
     create:
       created: アカウントを登録しました
     show:
-      title: プロフィール詳細ページ
+      title: プロフィール詳細
     edit:
-      title: プロフィール編集ページ
+      title: プロフィール編集
     update:
       updated: プロフィールを更新しました
     destroy:
@@ -24,6 +24,7 @@ ja:
         email: メールアドレス
         password: パスワード
         password_confirmation: パスワード（確認）
+        portrait: アイコン
         admin: 管理者権限
       post:
         title: タイトル
@@ -34,6 +35,7 @@ ja:
         place: 位置情報
         latitude: 経度
         longitude: 緯度
+        photos: 写真
         created_at: 作成日時
         tag: タグ
       tag:
@@ -124,18 +126,18 @@ ja:
       index: 情報一覧
       create: 情報を登録する
     index:
-      title: 情報一覧ページ
+      title: 情報一覧
       table:
         title: タイトル
         content: 内容
         created_at: 作成日時
         tag: タグ
     new:
-      title: 情報登録ページ
+      title: 情報登録
     show:
-      title: 情報詳細ページ
+      title: 情報詳細
     edit:
-      title: 情報編集ページ
+      title: 情報編集
     create:
       created: 情報を登録しました
     update:
@@ -147,7 +149,7 @@ ja:
       create: ログイン
       delete: ログアウト
     new:
-      title: ログインページ
+      title: ログイン
       sign_in: ログイン
     create:
       created: ログインしました
@@ -159,14 +161,14 @@ ja:
       index: タグ一覧
       create: タグを登録する
     index:
-      title: タグ一覧ページ
+      title: タグ一覧
       table:
         name: 名前
         num_of_tasks: 情報数
     new:
-      title: タグ登録ページ
+      title: タグ登録
     edit:
-      title: タグ編集ページ
+      title: タグ編集
     create:
       created: タグを登録しました
     update:

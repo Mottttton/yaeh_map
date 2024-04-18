@@ -1,0 +1,91 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ */
+@import "bootstrap";
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css");
+
+a {
+  text-decoration: none;
+}
+
+#map {
+  height: 400px;
+}
+
+.map {
+  position: relative;
+  width: 100%;
+  height: 65vh;
+  & iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+#notification {
+  margin-top: 56px;
+}
+
+.account-name {
+  height: 20px;
+}
+
+.profile-portrait{
+  max-height: 120px;
+  max-width: 120px;
+}
+
+.timeline-portrait{
+  height: 40px;
+  width: 40px;
+}
+
+h2.card-title {
+  font-size: 1.5rem;
+}
+
+.post-description {
+  word-wrap: break-word;
+  min-height: 50px;
+  & p {
+    white-space: pre-wrap;
+    text-align: justify;
+  }
+}
+
+.favorited{
+  color: $yellow-500;
+}
+
+.unfavorited{
+  color: $black;
+}
+
+// ログイン画面
+.form-signin {
+  max-width: 330px;
+  padding: 1rem;
+  & input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  & input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
