@@ -10,7 +10,7 @@
   <div class="form-check form-check-inline mb-3 d-flex justify-content-around">
     <% Post.genres.each do |genre| %>
       <div>
-        <%= f.radio_button :genre, genre[1] %>
+        <%= f.radio_button :genre, genre[0], id: "post_genre_#{genre[1]}" %>
         <%= f.label "genre_#{genre[1]}", genre[0] %>
       </div>
     <% end %>
