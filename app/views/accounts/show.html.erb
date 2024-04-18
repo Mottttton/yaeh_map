@@ -1,27 +1,35 @@
-<h1><%= t('.title') %></h1>
-<div>
-  <%= image_tag @account.portrait.variant(resize_to_limit: [200, 200]) if @account.portrait.attached? %>
+<div class="container">
+  <h1><%= t('.title') %></h1>
+  <div class="card p-3">
+    <div class="d-flex justify-content-between text-align-center align-items-center">
+      <div class='text-align-bottom'>
+        <span>
+          <% if @account.portrait.attached? %>
+            <%= image_tag @account.portrait.variant(resize_to_limit: [200, 200]), class: "profile-portrait rounded-circle" %>
+          <% else %>
+            <i class="bi bi-person-circle fs-1"></i>
+          <% end %>
+        </span>
+      </div>
+      <% if current_account.id == @account.id  %>
+        <%= link_to 'プロフィール編集', edit_account_path(@account.id), method: :get, id: "edit-account", class: 'btn btn-outline-primary' %>
+      <% end %>
+    </div>
+    <span class="fs-4"><%= @account.nickname %>(@<%= @account.name %>)</span>
+    <div>
+      <p>地域: <%= @account.region %></p>
+    </div>
+    <div>
+      <p>自己紹介</p>
+      <p><%= @account.self_introduction %></p>
+    </div>
+  </div>
 </div>
-<div>
-  <p><%= @account.nickname %>(@<%= @account.name %>)</p>
-</div>
-<div>
-  <p>お住まいの地域: <%= @account.region %></p>
-</div>
-<div>
-  <p>自己紹介</p>
-  <p><%= @account.self_introduction %></p>
-</div>
-
-<% if current_account.id == @account.id  %>
-  <%= link_to t('common.edit'), edit_account_path(@account.id), method: :get, id: "edit-account", class: 'btn btn-primary' %>
-<% end %>
-
-<div>
+<div class="container mt-3">
   <h2>投稿一覧</h2>
   <% if @account.posts == [] %>
     <p>まだ投稿はありません</p>
   <% else %>
-    <%= render partial: "posts/timeline", locals: { posts: @account.posts } %>
+    <%= render partial: "posts/timeline", locals: { posts: @posts } %>
   <% end %>
 </div>

@@ -1,58 +1,72 @@
 <%= form_with(model: post, local: true) do |f| %>
-  <div class="form-group">
+  <div class="form-floating mb-3">
+    <%= f.text_field :title, class: "form-control", placeholder: :title %>
     <%= f.label :title %>
-    <%= f.text_field :title %>
   </div>
-  <div class="form-group">
+  <div class="form-floating mb-3">
+    <%= f.text_area :description, class: "form-control", placeholder: :description, style: "height: 200px;" %>
     <%= f.label :description %>
-    <%= f.text_area :description %>
   </div>
-  <div class="form-group">
-    <%= f.label :genre %>
-    <%= f.select :genre, Post.genres.keys.map { |k| [k, k] }, {include_blank: true} %>
+  <div class="form-check form-check-inline mb-3 d-flex justify-content-around">
+    <% Post.genres.each do |genre| %>
+      <div>
+        <%= f.radio_button :genre, genre[1] %>
+        <%= f.label "genre_#{genre[1]}", genre[0] %>
+      </div>
+    <% end %>
   </div>
-  <div class="form-group">
-    <%= f.label :region %>
-    <%= f.select :region, Post.regions.keys.map { |k| [k, k] }, {include_blank: true} %>
+  <div class="mb-3">
+    <div>
+      <i class="bi bi-pin-map"></i>地図にピンをさしてください
+    </div>
+    <div id="map" class="mb-2">
+    </div>
+    <div class="input-group mb-3">
+      <input type="button" value="現在地" id="current_location" class="btn btn-outline-secondary">
+      <div class="form-floating">
+        <input id="placeSearch" class="form-control" type="textbox" placeholder="場所を検索">
+        <label for="placeSearch">場所を検索</label>
+      </div>
+      <input type="button" value="検索" id="search-location-btn" class="btn btn-outline-secondary">
+    </div>
   </div>
-  <div class="form-group">
+  <div class="form-floating mb-3">
+    <%= f.select :prefecture, Post.prefectures.keys.map { |k| [k, k] }, {include_blank: true}, {class: "form-select"} %>
     <%= f.label :prefecture %>
-    <%= f.select :prefecture, Post.prefectures.keys.map { |k| [k, k] }, {include_blank: true} %>
   </div>
-  <div class="form-group">
-    <%= f.label :place %>
-    <%= f.text_field :place %>
-    <%= f.label :latitude %>
-    <%= f.text_field :latitude %>
-    <%= f.label :longitude %>
-    <%= f.text_field :longitude %>
+  <div hidden>
+    <div class="form-floating mb-3">
+      <%= f.select :region, Post.regions.keys.map { |k| [k, k] }, {include_blank: true}, {class: "form-select"} %>
+      <%= f.label :region %>
+    </div>
+    <div class="form-floating mb-3">
+      <%= f.text_field :place, class: 'form-control' %>
+      <%= f.label :place %>
+    </div>
+    <div class="form-floating mb-3">
+      <%= f.text_field :latitude, class: 'form-control' %>
+      <%= f.label :latitude %>
+    </div>
+    <div class="form-floating mb-3">
+      <%= f.text_field :longitude, class: 'form-control' %>
+      <%= f.label :longitude %>
+    </div>
   </div>
-  <div class="field">
-    <% if post.photos.attached? %>
-      <% post.photos.each do |photo| %>
-        <%= image_tag photo, width: "100" %>
-      <% end %>
-    <% end %>
+  <div class="form-group mb-3">
     <%= f.label :photos %>
-    <%= f.file_field :photos, multiple: true %>
-  </div>
-  <div class="form-group">
-    <%= f.label :tag %>
-    <% current_account.tags.each do |tag| %>
-      <%= f.check_box :tag_ids, { multiple: true, include_hidden: false }, tag[:id] %>
-      <%= f.label :tag_ids, tag.name, value: tag[:id] %>
+    <span>(4枚まで)</span>
+    <% if post.photos.attached? %>
+      <div class="row g-2 mb-2">
+        <% post.photos.each do |photo| %>
+          <%= image_tag photo, width: "48%", class: "col-md-6" %>
+        <% end %>
+      </div>
     <% end %>
+    <div class="input-group form-file mb-3">
+      <%= f.file_field :photos, multiple: true, class: "form-control" %>
+    </div>
   </div>
-  <div class="actions">
+  <div class="actions d-flex justify-content-center">
     <%= f.submit id: action, class: 'btn btn-primary' %>
   </div>
 <% end %>
-<div>
-  <input id="address" type="textbox" placeholder="場所を入力してください">
-  <input type="button" value="検索" onclick="codeAddress()">
-  <input type="button" value="現在地" id="current_location">
-</div>
-<div class="map">
-  <div id="map">
-  </div>
-</div>

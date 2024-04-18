@@ -12,6 +12,7 @@ module YaehMap
     config.time_zone = 'Asia/Tokyo'
     config.i18n.default_locale = :ja
     config.active_model.i18n_customize_full_message = true
+    config.action_view.field_error_proc = Proc.new { |html_tag, instance| html_tag }
     config.generators do |g|
       g.test_framework :rspec,
         model_specs: true,

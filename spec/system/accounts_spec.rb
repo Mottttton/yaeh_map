@@ -15,7 +15,7 @@ RSpec.describe "Accounts", type: :system do
         fill_in('account_password', with: 'hanakonoko')
         fill_in('account_password_confirmation', with: 'hanakonoko')
         click_button('create-account')
-        expect(page).to have_content('情報一覧ページ')
+        expect(page).to have_content('情報一覧')
         expect(page).to have_text('アカウント登録が完了しました')
       end
     end
@@ -38,12 +38,12 @@ RSpec.describe "Accounts", type: :system do
           signin_as(first_account)
         end
         it '情報一覧画面に遷移し、「ログインしました」というメッセージが表示される' do
-          expect(page).to have_text('情報一覧ページ')
+          expect(page).to have_text('情報一覧')
           expect(page).to have_text('ログインしました')
         end
         it '自分のアカウント詳細画面にアクセスできる' do
           click_link('account-detail')
-          expect(page).to have_text('プロフィール詳細ページ')
+          expect(page).to have_text('プロフィール詳細')
           expect(page).to have_text(first_account.name)
           expect(page).to have_text(first_account.nickname)
           expect(page).to have_text(first_account.region)
@@ -53,12 +53,12 @@ RSpec.describe "Accounts", type: :system do
         it '自分のアカウント編集画面にアクセスできる' do
           click_link('account-detail')
           click_link('edit-account')
-          expect(page).to have_text('プロフィール編集ページ')
+          expect(page).to have_text('プロフィール編集')
           expect(page).to have_button('update-profile')
         end
         it '他人のアカウント詳細画面にアクセスできる' do
           visit account_path(second_account.id)
-          expect(page).to have_text('プロフィール詳細ページ')
+          expect(page).to have_text('プロフィール詳細')
           expect(page).to have_text(second_account.name)
           expect(page).to have_text(second_account.nickname)
           expect(page).to have_text(second_account.region)
@@ -67,7 +67,7 @@ RSpec.describe "Accounts", type: :system do
         end
         it '他人のアカウント編集画面にアクセスすると、情報一覧画面に遷移する' do
           visit edit_account_path(second_account.id)
-          expect(page).to have_text('情報一覧ページ')
+          expect(page).to have_text('情報一覧')
           expect(page).to have_text('アクセス権限がありません')
         end
         it 'ログアウトするとログイン画面に遷移し、「ログアウトしました」というメッセージが表示される' do
@@ -105,7 +105,7 @@ RSpec.describe "Accounts", type: :system do
         it '管理者用ページにアクセスしようとすると情報一覧ページにリダイレクトされる' do
           visit rails_admin_path
           expect(page).not_to have_text('サイト管理')
-          expect(page).to have_text('情報一覧ページ')
+          expect(page).to have_text('情報一覧')
           expect(page).to have_text('アクセス権限がありません')
         end
       end

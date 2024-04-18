@@ -1,9 +1,11 @@
 class AccountsController < ApplicationController
   before_action :authenticate_account!
-  before_action :set_account, only: %i(show edit update)
+  before_action :set_account, only: %i(edit update)
   before_action :correct_account, only: %i(edit update)
 
   def show
+    @account = Account.includes(posts: {photos_attachments: :blob}).with_attached_portrait.find(params[:id])
+    @posts = @account.posts.includes(:favorites, {photos_attachments: :blob}).order(created_at: 'DESC').page(params[:page])
   end
 
   def edit
@@ -20,7 +22,7 @@ class AccountsController < ApplicationController
   private
 
   def set_account
-    @account = Account.with_attached_portrait.find(params[:id])
+    @account = Account.includes(:posts).with_attached_portrait.find(params[:id])
   end
 
   def account_params

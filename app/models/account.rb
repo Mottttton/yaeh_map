@@ -7,6 +7,7 @@ class Account < ApplicationRecord
   validates :email, presence: true, uniqueness: true, length: { maximum: 255 }, format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i  }
   validates :nickname, presence: true, length: { maximum: 50 }
   validates :self_introduction, length: { maximum: 500 }
+  validates :portrait, content_type: %i(png jpg jpeg)
   enum region: Region.regions, _prefix: true
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable

@@ -1,10 +1,11 @@
 <% if post.favorites.pluck(:account_id).include?(current_account.id) %>
   <%= link_to post_favorite_path(post.id, post.favorites.pluck(:id, :account_id).filter {|a| a[1] == current_account.id}[0][0]), method: :delete, id: "fav_link-#{post.id}", class: "favorite-link delete-#{post.id}", remote: true do %>
-    <i class="material-icons">star</i>
+    <span class="text-black">v(･∀･)yaeh!</span>
+    <i class="bi bi-hand-thumbs-up-fill favorited"></i>
   <% end %>
 <% else %>
   <%= link_to post_favorites_path(post.id), method: :post, id: "fav_link-#{post.id}", class: "favorite-link post-#{post.id}", remote: true do %>
-    <i class="material-icons">star_border</i>
+    <i class="bi bi-hand-thumbs-up unfavorited"></i>
   <% end %>
 <% end %>
 <span id="num_of_fav-<%= post.id %>">
