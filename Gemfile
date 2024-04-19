@@ -40,6 +40,7 @@ gem 'kaminari'
 gem 'bootstrap', '~> 5.3.0'
 gem 'jquery-rails'
 gem 'bootstrap5-kaminari-views', '~> 0.0.1'
+gem 'unicorn'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -53,6 +54,7 @@ group :development do
   gem "capistrano-rails", "~> 1.6", require: false
   gem 'capistrano-safe-deploy-to'
   gem 'capistrano-rbenv', '~> 2.2'
+  gem 'capistrano3-unicorn'
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console', '>= 4.1.0'
   # Display performance information such as SQL time and flame graphs for each request in your browser.

@@ -51,7 +51,7 @@
 # ------------------------------------
 server "3.114.235.157",
   user: "ec2-user",
-  roles: %w{web app},
+  roles: %w{web db app},
   ssh_options: {
     user: "ec2-user", # overrides user setting above
     keys: %w(~/workspace/aws/yaeh_map.pem),
