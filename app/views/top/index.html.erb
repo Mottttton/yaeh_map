@@ -1,0 +1,51 @@
+<div class="px-4 pt-5 my-5 text-center border-bottom">
+  <h1 class="display-4 fw-bold text-body-emphasis">Yaeh Map</h1>
+  <div class="col-lg-6 mx-auto">
+    <p class="lead mb-4">仲間と情報をシェアしてツーリングをもっと楽しく安全に</p>
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
+      <%= link_to "新規登録", new_account_registration_path, class: 'sign-up btn btn-primary btn-lg px-4 me-md-2' %>
+      <%= link_to "ログイン", new_account_session_path, class: 'sign-in btn btn-outline-secondary btn-lg px-4' %>
+    </div>
+  </div>
+  <div class="overflow-hidden" style="max-height: 65vh;">
+    <div class="container px-5">
+      <%= image_tag 'app_example', class: "img-fluid border rounded-3 shadow-lg mb-4", alt: "top cover", width: "700", height: "500", loading: "lazy" %>
+    </div>
+  </div>
+</div>
+<div class="container col-xxl-8 px-4 py-5">
+  <div class="row flex-lg-row align-items-center g-5 py-3">
+    <div class="col">
+      <h2 class="pb-2 border-bottom">コンセプト</h2>
+      <p class="lead">
+        Yaeh Mapはツーリングが好きなライダーのための情報共有SNSです。Yaeh(ヤエー)とはツーリングですれ違ったライダー同士の挨拶で、お互いの旅の安全を込めたハンドサインです。ユーザー同士で危険情報を共有することで少しでもオートバイの事故が減ることを願い、Yaeh Mapをつくりました。
+      </p>
+      <p class="lead">
+        注意情報だけでなくオススメのツーリングスポットやタイムリーな情報もシェアして楽しく安全にツーリングしてください！
+      </p>
+    </div>
+  </div>
+</div>
+<div class="container px-4 py-3" id="featured-3">
+  <h2 class="pb-2 border-bottom">機能紹介</h2>
+  <div class="row g-4 py-5">
+    <div class="feature col">
+      <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3">
+        <i class="bi bi-pin-map-fill"></i>
+      </div>
+      <h3 class="fs-2 text-body-emphasis">地図付きの情報投稿</h3>
+      <ul>
+        <li>ツーリングスポットや危険情報を地図付きで投稿</li>
+        <li>写真も添付可能(4枚まで)</li>
+        <li>キーワードや都道府県で情報検索可能</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="container col-lg-6 mx-auto">
+  <h2 class="lead fw-bold mb-4 text-center">さっそく使ってみる</h2>
+  <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
+    <%= link_to "新規登録", new_account_registration_path, class: 'sign-up btn btn-primary btn-lg px-4 me-md-2' %>
+    <%= link_to "ログイン", new_account_session_path, class: 'sign-in btn btn-outline-secondary btn-lg px-4' %>
+  </div>
+</div>
