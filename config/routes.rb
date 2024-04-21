@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  root 'posts#index'
+  root 'top#index'
+  resources :top, only: %i(index)
   resources :posts do
     resources :favorites, only: %i(create destroy)
   end

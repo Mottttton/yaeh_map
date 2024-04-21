@@ -1,15 +1,17 @@
-<h1><%= t('.title') %></h1>
-<% if @post.errors.any? %>
-  <div class="alert alert-danger">
-    <h2 class="alert-heading">情報の更新に失敗しました</h2>
-    <ul>
-      <% @post.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
-<%= render 'form', {post: @post, action: 'update-post'} %>
+<div class="container mt-5">
+  <h1><%= t('.title') %></h1>
+  <% if @post.errors.any? %>
+    <div class="alert alert-danger">
+      <h2 class="alert-heading">情報の更新に失敗しました</h2>
+      <ul>
+        <% @post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <%= render 'form', {post: @post, action: 'update-post'} %>
+</div>
 <div type="text/javascript">
   <%= javascript_pack_tag 'map_edit_post', 'data-turbolinks-track': 'reload' %>
   <script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap" async defer></script>
