@@ -9,26 +9,60 @@ RSpec.describe "Posts", type: :system do
     before do
       signin_as(first_account)
     end
-    context '情報を登録した場合' do
-      it '登録した情報が表示される' do
+    context '場所の検索やピンを設置しない場合' do
+      it '現在地または東京駅の位置情報で新規投稿できる' do
         visit new_post_path
         sleep(5)
-        fill_in('post_title', with: '凍結注意')
-        fill_in('post_description', with: '山間部はところどころ凍結しています。')
+        fill_in('post_title', with: '現在地テスト')
+        fill_in('post_description', with: 'テスト投稿')
         choose('post_genre_2')
-        find('#post_region', visible: false)
-        # find('#post_prefecture', visible: false).set('長野')
-        # select('北陸', from: 'post_region', visible: false)
-        # select('長野', from: 'post_prefecture')
-        # fill_in('post_place', with: 'ChIJHUi0-YT-HGAR5D3l9F8xY1o')
-        # fill_in('post_latitude', with: '36.00457135732795')
-        # fill_in('post_longitude', with: '138.0080174668216')
-        # click_button("create-post") # [投稿する]ボタン
-        # expect(page).to have_text('情報を登録しました')
-        # expect(page).to have_text('凍結注意')
-        # expect(page).to have_text('注意')
-        # expect(page).to have_text('北陸')
-        # expect(page).to have_text('長野')
+        sleep(1)
+        click_button("create-post") # [投稿する]ボタン
+        expect(page).to have_text('情報を登録しました')
+        timeline = all("#timeline .post")
+        expect(timeline[0].text).to have_text("現在地テスト")
+        expect(timeline[0].text).to have_text("テスト投稿")
+      end
+    end
+    context '場所を検索した場合' do
+      it '検索した地点の位置情報情報で新規投稿できる' do
+        visit new_post_path
+        sleep(5)
+        fill_in('post_title', with: '東京駅')
+        fill_in('post_description', with: 'テスト投稿')
+        choose('post_genre_2')
+        fill_in('placeSearch', with: '東京駅')
+        click_button("search-location-btn") # [検索]ボタン
+        sleep(1)
+        click_button("create-post") # [投稿する]ボタン
+        expect(page).to have_text('情報を登録しました')
+        timeline = all("#timeline .post")
+        expect(timeline[0].text).to have_text("東京駅")
+        expect(timeline[0].text).to have_text("テスト投稿")
+        expect(timeline[0].text).to have_text("関東")
+      end
+    end
+    context '現在地を取得した場合' do
+      it '現在地で新規投稿できる' do
+        visit new_post_path
+        sleep(5)
+        fill_in('post_title', with: '現在地テスト')
+        fill_in('post_description', with: 'テスト投稿')
+        choose('post_genre_2')
+        fill_in('placeSearch', with: '東京駅')
+        click_button("search-location-btn") # [検索]ボタン
+        sleep(1)
+        tokyo_sta_lat = find("#post_latitude", visible: false).value
+        tokyo_sta_lng = find("#post_longitude", visible: false).value
+        click_button("current_location") # [現在地]ボタン
+        sleep(5)
+        expect(find("#post_latitude", visible: false).value).not_to eq tokyo_sta_lat
+        expect(find("#post_longitude", visible: false).value).not_to eq tokyo_sta_lng
+        click_button("create-post") # [投稿する]ボタン
+        expect(page).to have_text('情報を登録しました')
+        timeline = all("#timeline .post")
+        expect(timeline[0].text).to have_text("現在地テスト")
+        expect(timeline[0].text).to have_text("テスト投稿")
       end
     end
   end
@@ -55,11 +89,9 @@ RSpec.describe "Posts", type: :system do
         fill_in('post_title', with: 'スリップ注意')
         fill_in('post_description', with: '山間部はところどころ凍結しています。')
         choose('post_genre_2')
-        select('北陸', from: 'post_region')
-        select('長野', from: 'post_prefecture')
-        fill_in('post_place', with: 'ChIJHUi0-YT-HGAR5D3l9F8xY1o')
-        fill_in('post_latitude', with: '36.00457135732795')
-        fill_in('post_longitude', with: '138.0080174668216')
+        fill_in('placeSearch', with: '長野県松本市')
+        click_button("search-location-btn") # [検索]ボタン
+        sleep(1)
         click_button("create-post") # [投稿する]ボタン
 
         timeline = all("#timeline .post")
@@ -67,6 +99,109 @@ RSpec.describe "Posts", type: :system do
         expect(timeline[1].text).to have_text("駅前駐車場")
         expect(timeline[2].text).to have_text("工事中。片側1車線で交互に通行しています。")
         expect(timeline[3].text).to have_text("凍結注意")
+      end
+    end
+  end
+
+  describe '詳細画面' do
+    let!(:first_account) { FactoryBot.create(:first_account, :with_posts) }
+    let!(:second_account) { FactoryBot.create(:second_account, :with_posts) }
+
+    context '自分の投稿詳細画面にアクセスした場合' do
+      before do
+        signin_as(first_account)
+      end
+      it '編集ボタンが表示されている' do
+        my_post = first_account.posts.first
+        visit post_path(my_post.id)
+        expect(page).to have_link("edit-post")
+      end
+      it '削除ボタンが表示されている' do
+        my_post = first_account.posts.first
+        visit post_path(my_post.id)
+        expect(page).to have_link("destroy-post")
+      end
+    end
+
+    context '他の人の投稿詳細画面にアクセスした場合' do
+      before do
+        signin_as(first_account)
+      end
+      it '編集ボタンが表示されていない' do
+        anothers_post = second_account.posts.first
+        visit post_path(anothers_post.id)
+        expect(page).not_to have_link("edit-post")
+      end
+      it '削除ボタンが表示されていない' do
+        anothers_post = second_account.posts.first
+        visit post_path(anothers_post.id)
+        expect(page).not_to have_link("destroy-post")
+      end
+    end
+
+    context '投稿を削除する場合' do
+      before do
+        signin_as(first_account)
+      end
+      it '自分の投稿を削除できる' do
+        my_post = first_account.posts.first
+        visit post_path(my_post.id)
+        click_link('destroy-post')
+        page.driver.browser.switch_to.alert.accept
+        expect(page).to have_text("情報を削除しました")
+      end
+    end
+  end
+
+  describe '編集画面' do
+    let!(:first_account) { FactoryBot.create(:first_account, :with_posts) }
+    let!(:second_account) { FactoryBot.create(:second_account, :with_posts) }
+
+    context '自分の投稿編集画面にアクセスした場合' do
+      before do
+        signin_as(first_account)
+      end
+      it '入力欄に登録された内容が表示されている' do
+        my_post = first_account.posts.first
+        visit edit_post_path(my_post.id)
+        title_input = find_by_id("post_title").value
+        post_form = find('form')
+        expect(title_input).to eq my_post.title
+        expect(post_form.text).to have_text(my_post.description)
+      end
+      it '編集した内容が反映されている' do
+        my_post = first_account.posts.first
+        visit post_path(my_post.id)
+        expect(page).to have_text my_post.title
+        expect(page).to have_text(my_post.description)
+        expect(page).to have_text(my_post.region)
+        expect(page).to have_text(my_post.prefecture)
+        expect(page).to have_text(my_post.genre)
+
+        visit edit_post_path(my_post.id)
+        fill_in('post_title', with: '東京駅')
+        fill_in('post_description', with: 'テスト投稿')
+        choose('post_genre_0')
+        fill_in('placeSearch', with: '東京駅')
+        click_button("search-location-btn") # [検索]ボタン
+        sleep(1)
+        click_button("update-post") # [投稿する]ボタン
+        expect(page).to have_text('情報を更新しました')
+        expect(page).to have_text("東京駅")
+        expect(page).to have_text("テスト投稿")
+        expect(page).to have_text("関東")
+        expect(page).to have_text("オススメ")
+      end
+    end
+    context '他の人の投稿編集画面にアクセスした場合' do
+      before do
+        signin_as(first_account)
+      end
+      it '投稿一覧ページにリダイレクトされる' do
+        anothers_post = second_account.posts.first
+        visit edit_post_path(anothers_post.id)
+        expect(page).to have_text("アクセス権限がありません")
+        expect(page).to have_text("投稿一覧")
       end
     end
   end
