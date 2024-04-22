@@ -61,12 +61,14 @@ RSpec.describe "Accounts", type: :system do
         end
         it '自分のアカウント詳細画面にアクセスできる' do
           click_link('account-detail')
+          account_posts = find_by_id('timeline')
           expect(page).to have_text('プロフィール詳細')
           expect(page).to have_text(first_account.name)
           expect(page).to have_text(first_account.nickname)
           expect(page).to have_text(first_account.region)
           expect(page).to have_text(first_account.self_introduction)
           expect(page).to have_link('edit-account')
+          expect(account_posts).to have_text(first_account.posts.last.title)
         end
         it '自分のアカウント編集画面にアクセスできる' do
           click_link('account-detail')
@@ -76,12 +78,14 @@ RSpec.describe "Accounts", type: :system do
         end
         it '他人のアカウント詳細画面にアクセスできる' do
           visit account_path(second_account.id)
+          account_posts = find_by_id('timeline')
           expect(page).to have_text('プロフィール詳細')
           expect(page).to have_text(second_account.name)
           expect(page).to have_text(second_account.nickname)
           expect(page).to have_text(second_account.region)
           expect(page).to have_text(second_account.self_introduction)
           expect(page).not_to have_link('edit-account')
+          expect(account_posts).to have_text(second_account.posts.last.title)
         end
         it '他人のアカウント編集画面にアクセスすると、情報一覧画面に遷移する' do
           visit edit_account_path(second_account.id)
