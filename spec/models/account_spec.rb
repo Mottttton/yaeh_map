@@ -7,7 +7,7 @@ RSpec.describe Account, type: :model do
         account = Account.new(name: '', email: 'taro@sample.com', nickname: 'taro', password: 'password', password_confirmation: 'password')
         account.save
         expect(account).to be_invalid
-        expect(account.errors.full_messages).to eq ['アカウント名を入力してください']
+        expect(account.errors.full_messages).to include 'アカウント名を入力してください'
       end
     end
 

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "Accounts", type: :system do
   include SigninMacro
 
-  describe 'アカウント登録機能テスト' do
+  describe 'アカウント登録機能' do
     before do
       visit new_account_registration_path
     end
@@ -27,13 +27,31 @@ RSpec.describe "Accounts", type: :system do
         expect(page).to have_content('ログインもしくはアカウント登録してください')
       end
     end
+    context 'アカウントを削除した場合' do
+      let!(:first_account) { FactoryBot.create(:first_account, :with_posts) }
+      before do
+        signin_as(first_account)
+      end
+      it 'アカウントに紐づいている全ての投稿も削除される' do
+        expect(Post.all.count).not_to eq 0
+        visit edit_account_registration_path
+        click_on('アカウント削除')
+        page.driver.browser.switch_to.alert.accept
+        sleep(0.5)
+        notification = find_by_id('notification').text
+        main = find('main').text
+        expect(notification).to have_text('アカウントを削除しました')
+        expect(main).to have_text('ログイン')
+        expect(Post.all.count).to eq 0
+      end
+    end
   end
 
-  describe 'ログイン機能テスト' do
+  describe 'ログイン機能' do
     describe '画面遷移' do
       context '登録済みの一般アカウントでログインした場合' do
-        let!(:first_account) { FactoryBot.create(:first_account) }
-        let!(:second_account) { FactoryBot.create(:second_account) }
+        let!(:first_account) { FactoryBot.create(:first_account, :with_posts) }
+        let!(:second_account) { FactoryBot.create(:second_account, :with_posts) }
         before do
           signin_as(first_account)
         end
@@ -79,6 +97,8 @@ RSpec.describe "Accounts", type: :system do
       end
     end
   end
+
+
   describe '管理者機能' do
     describe '画面遷移' do
       let!(:first_account) { FactoryBot.create(:first_account) }
