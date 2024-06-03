@@ -1,3 +1,71 @@
+// マーカーの設置
+export function resetMarkerAndPanTo(latLng, hasMarker) {
+  window.map.panTo(latLng);
+  if (hasMarker == true){
+    window.marker.setMap(null);
+  }
+  hasMarker = true;
+}
+
+export function placeMarker(latLng) {
+  window.marker = new google.maps.Marker({
+    map: window.map,
+    position: latLng,
+    draggable: true	// ドラッグ可能にする
+  });
+  // マーカーのドロップ（ドラッグ終了）時のイベント
+  google.maps.event.addListener( window.marker, 'dragend', e => {
+    // イベントの引数eの、プロパティ.latLngが緯度経度
+    inputLatLng(e.latLng)
+  });
+}
+
+// 検索後のマップ作成
+export function searchAddress(searchLocationBtn, geocoder){
+  let hasMarker = false;
+  searchLocationBtn.addEventListener("click", () => {
+    let inputAddress = document.getElementById('placeSearch').value;
+    geocoder.geocode( { 'address': inputAddress}, function(results, status) {
+      if (status == 'OK') {
+        // マーカーが複数できないようにする
+        if (hasMarker === true){
+          window.marker.setMap(null);
+        }
+        //新しくマーカーを作成する
+        window.map.setCenter(results[0].geometry.location);
+        placeMarker(results[0].geometry.location)
+        hasMarker = true;
+
+        //検索した時に緯度経度を入力する
+        inputLatLng(results[0].geometry.location, geocoder);
+      } else {
+        alert('該当する結果がありませんでした：' + status);
+      }
+    });
+  })
+}
+// 取得した位置情報を入力
+export function inputLatLng(latLng, geocoder) {
+  document.getElementById('post_latitude').value = latLng.lat();
+  document.getElementById('post_longitude').value = latLng.lng();
+  geocoder.geocode({location: latLng}, (results) => {
+    let arryLength = results[0].address_components.length;
+    let pref = results[0].address_components[arryLength-3].short_name.replace('県', '').replace('府', '').replace('東京都', '東京');
+    let region = selectRegion(pref)
+    document.getElementById('post_prefecture').value = pref
+    document.getElementById('post_region').value = region;
+    document.getElementById('post_place').value = results[0].place_id;
+  })
+}
+
+export function inputRegion() {
+  const prefSelectBox = document.getElementById('post_prefecture');
+  prefSelectBox.addEventListener("change", () => {
+    let pref = prefSelectBox.value;
+    document.getElementById('post_region').value = selectRegion(pref);
+  })
+}
+
 export function selectRegion(pref) {
   let region
   switch (pref) {
