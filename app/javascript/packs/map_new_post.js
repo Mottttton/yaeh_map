@@ -1,8 +1,9 @@
-import { resetMarkerAndPanTo, placeMarker, searchAddress, inputLatLng, inputRegion } from "./map_common.js"
+import { resetMarker, panTo, placeMarker, inputLatLng, inputPrefRegionPlaceId, inputRegion } from "./map_common.js"
 
 let map;
 let infoWindow;
 let geocoder;
+let marker;
 let hasMarker = false;
 
 const searchLocationBtn = document.getElementById('search-location-btn')
@@ -22,13 +23,24 @@ function initNewPostMap() {
     });
     
     // 現在地の経度と緯度を入力
-    inputLatLng(pos, geocoder);
+    inputLatLng(pos);
+    inputPrefRegionPlaceId(pos, geocoder);
     
     window.map.addListener("click", (e) => {
-      resetMarkerAndPanTo(e.latLng, hasMarker);
+      if (hasMarker === true) {
+        resetMarker();
+      }
+      panTo(e.latLng);
+      marker = placeMarker(e.latLng);
       hasMarker = true;
-      placeMarker(e.latLng);
-      inputLatLng(e.latLng, geocoder);
+      inputLatLng(e.latLng);
+      inputPrefRegionPlaceId(e.latLng, geocoder);
+      // マーカーのドロップ（ドラッグ終了）時のイベント
+      google.maps.event.addListener( window.marker, 'dragend', e => {
+        // イベントの引数eの、プロパティ.latLngが緯度経度
+        inputLatLng(e.latLng)
+        inputPrefRegionPlaceId(e.latLng, geocoder);
+      });
     });
   };
   function failGetCurrentPosition() {
@@ -42,21 +54,29 @@ function initNewPostMap() {
       zoom: 15,
     });
     // 現在地の経度と緯度を入力
-    inputLatLng(pos, geocoder);
+    inputLatLng(pos);
+    inputPrefRegionPlaceId(pos, geocoder);
     
     window.map.addListener("click", (e) => {
-      resetMarkerAndPanTo(e.latLng, hasMarker);
+      if (hasMarker === true) {
+        resetMarker();
+      }
+      panTo(e.latLng);
       placeMarker(e.latLng);
       hasMarker = true;
-      inputLatLng(e.latLng, geocoder);
+      inputLatLng(e.latLng);
+      inputPrefRegionPlaceId(e.latLng, geocoder);
+      // マーカーのドロップ（ドラッグ終了）時のイベント
+      google.maps.event.addListener( window.marker, 'dragend', e => {
+        // イベントの引数eの、プロパティ.latLngが緯度経度
+        inputLatLng(e.latLng);
+        inputPrefRegionPlaceId(e.latLng, geocoder);
+      });
     });
   }
-  
+
   geocoder = new google.maps.Geocoder()
   navigator.geolocation.getCurrentPosition(succeedGetCurrentPosition, failGetCurrentPosition);
-  // 現在地ボタンのイベント設定
-  locationButton.addEventListener("click", moveCurrentLocation)
-  searchAddress(searchLocationBtn, geocoder);
 }
 
 // 現在地への移動
@@ -73,7 +93,8 @@ function moveCurrentLocation() {
         window.map.setCenter(pos);
 
         // 現在地の経度と緯度を入力
-        inputLatLng(pos, geocoder);
+        inputLatLng(pos);
+        inputPrefRegionPlaceId(pos, geocoder);
       },
       () => {
         handleLocationError(true, infoWindow, map.getCenter());
@@ -98,5 +119,29 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
 
 window.onload = function() {
   inputRegion();
+  // 現在地ボタンのイベント設定
+  locationButton.addEventListener("click", moveCurrentLocation);
+  // 検索ボタンのイベント設定
+  searchLocationBtn.addEventListener("click", () => {
+    const inputAddress = document.getElementById('placeSearch').value;
+    geocoder.geocode( { 'address': inputAddress}, function(results, status) {
+      if (status == 'OK') {
+        // マーカーが複数できないようにする
+        if (hasMarker === true){
+          window.marker.setMap(null);
+        }
+        //新しくマーカーを作成する
+        window.map.setCenter(results[0].geometry.location);
+        placeMarker(results[0].geometry.location)
+        hasMarker = true;
+
+        //検索した時に緯度経度を入力する
+        inputLatLng(results[0].geometry.location);
+        inputPrefRegionPlaceId(results[0].geometry.location, geocoder)
+      } else {
+        alert('該当する結果がありませんでした：' + status);
+      }
+    });
+  });
 }
 window.initMap = initNewPostMap;
