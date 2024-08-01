@@ -62,7 +62,7 @@ function initNewPostMap() {
         resetMarker();
       }
       panTo(e.latLng);
-      placeMarker(e.latLng);
+      marker = placeMarker(e.latLng);
       hasMarker = true;
       inputLatLng(e.latLng);
       inputPrefRegionPlaceId(e.latLng, geocoder);
@@ -128,11 +128,11 @@ window.onload = function() {
       if (status == 'OK') {
         // マーカーが複数できないようにする
         if (hasMarker === true){
-          window.marker.setMap(null);
+          resetMarker();
         }
         //新しくマーカーを作成する
         window.map.setCenter(results[0].geometry.location);
-        placeMarker(results[0].geometry.location)
+        marker = placeMarker(results[0].geometry.location)
         hasMarker = true;
 
         //検索した時に緯度経度を入力する
