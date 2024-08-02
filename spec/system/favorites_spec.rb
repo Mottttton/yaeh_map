@@ -9,6 +9,7 @@ RSpec.describe "Favorites", type: :system do
 
     before do
       signin_as(first_account)
+      sleep(0.5)
     end
     describe 'お気に入りの登録削除' do
       context '情報投稿一覧画面' do

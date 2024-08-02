@@ -1,3 +1,45 @@
+// マーカーの設置
+export function resetMarker() {
+  window.marker.setMap(null);
+}
+
+export function panTo(latLng) {
+  window.map.panTo(latLng);
+}
+
+export function placeMarker(latLng) {
+  window.marker = new google.maps.Marker({
+    map: window.map,
+    position: latLng,
+    draggable: true	// ドラッグ可能にする
+  });
+}
+
+// 取得した位置情報を入力
+export function inputLatLng(latLng) {
+  document.getElementById('post_latitude').value = latLng.lat();
+  document.getElementById('post_longitude').value = latLng.lng();
+}
+
+export function inputPrefRegionPlaceId(latLng, gCoder){ 
+  gCoder.geocode({location: latLng}, (results) => {
+    let arryLength = results[0].address_components.length;
+    let pref = results[0].address_components[arryLength-3].short_name.replace('県', '').replace('府', '').replace('東京都', '東京');
+    let region = selectRegion(pref)
+    document.getElementById('post_prefecture').value = pref
+    document.getElementById('post_region').value = region;
+    document.getElementById('post_place').value = results[0].place_id;
+  })
+}
+
+export function inputRegion() {
+  const prefSelectBox = document.getElementById('post_prefecture');
+  prefSelectBox.addEventListener("change", () => {
+    let pref = prefSelectBox.value;
+    document.getElementById('post_region').value = selectRegion(pref);
+  })
+}
+
 export function selectRegion(pref) {
   let region
   switch (pref) {

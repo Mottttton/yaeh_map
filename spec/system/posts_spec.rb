@@ -8,6 +8,7 @@ RSpec.describe "Posts", type: :system do
     let!(:first_account) { FactoryBot.create(:first_account) }
     before do
       signin_as(first_account)
+      sleep(0.5)
     end
     context '場所の検索やピンを設置しない場合' do
       it '現在地または東京駅の位置情報で新規投稿できる' do
@@ -73,6 +74,7 @@ RSpec.describe "Posts", type: :system do
 
     before do
       signin_as(first_account)
+      sleep(0.5)
     end
     context '一覧画面に遷移した場合' do
       it '登録済みの情報一覧が作成日時の降順で表示される' do
@@ -110,6 +112,7 @@ RSpec.describe "Posts", type: :system do
     context '自分の投稿詳細画面にアクセスした場合' do
       before do
         signin_as(first_account)
+        sleep(0.5)
       end
       it '編集ボタンが表示されている' do
         my_post = first_account.posts.first
@@ -126,6 +129,7 @@ RSpec.describe "Posts", type: :system do
     context '他の人の投稿詳細画面にアクセスした場合' do
       before do
         signin_as(first_account)
+        sleep(0.5)
       end
       it '編集ボタンが表示されていない' do
         anothers_post = second_account.posts.first
@@ -142,6 +146,7 @@ RSpec.describe "Posts", type: :system do
     context '投稿を削除する場合' do
       before do
         signin_as(first_account)
+        sleep(0.5)
       end
       it '自分の投稿を削除できる' do
         my_post = first_account.posts.first
@@ -160,6 +165,7 @@ RSpec.describe "Posts", type: :system do
     context '自分の投稿編集画面にアクセスした場合' do
       before do
         signin_as(first_account)
+        sleep(0.5)
       end
       it '入力欄に登録された内容が表示されている' do
         my_post = first_account.posts.first
@@ -196,6 +202,7 @@ RSpec.describe "Posts", type: :system do
     context '他の人の投稿編集画面にアクセスした場合' do
       before do
         signin_as(first_account)
+        sleep(0.5)
       end
       it '投稿一覧ページにリダイレクトされる' do
         anothers_post = second_account.posts.first
@@ -214,6 +221,7 @@ RSpec.describe "Posts", type: :system do
       context 'アカウントに地域の設定をしていない場合' do
         before do
           signin_as(no_region_account)
+          sleep(0.5)
         end
         it 'タイムラインに全ての地域の投稿が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -223,6 +231,7 @@ RSpec.describe "Posts", type: :system do
       context 'アカウントに地域の設定をしている場合' do
         before do
           signin_as(set_region_account)
+          sleep(0.5)
         end
         it '設定した地域の投稿のみ表示されている' do
           posts_in_timeline = find_by_id('timeline')
@@ -242,6 +251,7 @@ RSpec.describe "Posts", type: :system do
       context 'アカウントに地域の設定をしていない場合' do
         before do
           signin_as(no_region_account)
+          sleep(0.5)
         end
         it '検索したキーワードを全国から検索し表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -303,6 +313,7 @@ RSpec.describe "Posts", type: :system do
       context 'アカウントに地域の設定をしている場合' do
         before do
           signin_as(set_region_account)
+          sleep(0.5)
         end
         it '検索したキーワードを全国から検索し表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -366,6 +377,7 @@ RSpec.describe "Posts", type: :system do
       context 'アカウントに地域の設定をしていない場合' do
         before do
           signin_as(no_region_account)
+          sleep(0.5)
         end
         it '選択した地域の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -381,6 +393,7 @@ RSpec.describe "Posts", type: :system do
       context 'アカウントに地域の設定をしている場合' do
         before do
           signin_as(set_region_account)
+          sleep(0.5)
         end
         it '選択した地域の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -398,6 +411,7 @@ RSpec.describe "Posts", type: :system do
       context 'アカウントに地域の設定をしていない場合' do
         before do
           signin_as(no_region_account)
+          sleep(0.5)
         end
         it '選択した都道府県の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -467,6 +481,7 @@ RSpec.describe "Posts", type: :system do
       context 'アカウントに地域の設定をしている場合' do
         before do
           signin_as(set_region_account)
+          sleep(0.5)
         end
         it '選択した都道府県の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -538,6 +553,7 @@ RSpec.describe "Posts", type: :system do
       context 'アカウントに地域の設定をしていない場合' do
         before do
           signin_as(no_region_account)
+          sleep(0.5)
         end
         it '選択した分類の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -599,6 +615,7 @@ RSpec.describe "Posts", type: :system do
       context 'アカウントに地域の設定をしている場合' do
         before do
           signin_as(set_region_account)
+          sleep(0.5)
         end
         it '選択した分類の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
