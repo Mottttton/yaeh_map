@@ -13,7 +13,7 @@ RSpec.describe "Posts", type: :system do
     context '場所の検索やピンを設置しない場合' do
       it '現在地または東京駅の位置情報で新規投稿できる' do
         visit new_post_path
-        sleep(5)
+        sleep(7)
         fill_in('post_title', with: '現在地テスト')
         fill_in('post_description', with: 'テスト投稿')
         choose('post_genre_2')
@@ -28,7 +28,7 @@ RSpec.describe "Posts", type: :system do
     context '場所を検索した場合' do
       it '検索した地点の位置情報情報で新規投稿できる' do
         visit new_post_path
-        sleep(5)
+        sleep(7)
         fill_in('post_title', with: '東京駅')
         fill_in('post_description', with: 'テスト投稿')
         choose('post_genre_2')
@@ -46,7 +46,7 @@ RSpec.describe "Posts", type: :system do
     context '現在地を取得した場合' do
       it '現在地で新規投稿できる' do
         visit new_post_path
-        sleep(5)
+        sleep(7)
         fill_in('post_title', with: '現在地テスト')
         fill_in('post_description', with: 'テスト投稿')
         choose('post_genre_2')
@@ -87,7 +87,7 @@ RSpec.describe "Posts", type: :system do
     context '新たに情報を作成した場合' do
       it '新しい情報が一番上に表示される' do
         visit new_post_path
-        sleep(5)
+        sleep(7)
         fill_in('post_title', with: 'スリップ注意')
         fill_in('post_description', with: '山間部はところどころ凍結しています。')
         choose('post_genre_2')

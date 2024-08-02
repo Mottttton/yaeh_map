@@ -27,6 +27,13 @@ RSpec.describe "Accounts", type: :system do
         expect(page).to have_content('ログインもしくはアカウント登録してください')
       end
     end
+    context 'ログイン画面からサイト名をクリックした場合' do
+      it 'ホーム画面に遷移する' do
+        click_link('Yaeh Map')
+        expect(page).to have_content('コンセプト')
+        expect(page).to have_content('機能紹介')
+      end
+    end
     context 'アカウントを削除した場合' do
       let!(:first_account) { FactoryBot.create(:first_account, :with_posts) }
       before do
@@ -99,6 +106,17 @@ RSpec.describe "Accounts", type: :system do
           expect(page).to have_text('ログイン')
           expect(page).to have_button('create-session')
           expect(page).to have_text('ログアウトしました')
+        end
+        it 'サイト名をクリックすると情報一覧画面に遷移する' do
+          visit new_post_path
+          sleep(0.5)
+          expect(page).to have_content('情報登録')
+          expect(page).to have_button('登録する')
+          click_link('Yaeh Map')
+          sleep(0.5)
+          expect(page).to have_content('情報一覧')
+          expect(page).not_to have_content('情報投稿')
+          expect(page).not_to have_button('登録する')
         end
       end
     end
