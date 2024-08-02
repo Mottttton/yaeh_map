@@ -31,6 +31,7 @@ RSpec.describe "Accounts", type: :system do
       let!(:first_account) { FactoryBot.create(:first_account, :with_posts) }
       before do
         signin_as(first_account)
+        sleep(0.5)
       end
       it 'アカウントに紐づいている全ての投稿も削除される' do
         expect(Post.all.count).not_to eq 0
@@ -54,6 +55,7 @@ RSpec.describe "Accounts", type: :system do
         let!(:second_account) { FactoryBot.create(:second_account, :with_posts) }
         before do
           signin_as(first_account)
+          sleep(0.5)
         end
         it '情報一覧画面に遷移し、「ログインしました」というメッセージが表示される' do
           expect(page).to have_text('情報一覧')
@@ -110,6 +112,7 @@ RSpec.describe "Accounts", type: :system do
       context '管理者アカウントでログイン' do
         before do
           signin_as(first_account)
+          sleep(0.5)
         end
         it '管理者用ページのリンクが存在する' do
           expect(page).to have_link('admin-index')
@@ -122,6 +125,7 @@ RSpec.describe "Accounts", type: :system do
       context '一般アカウントでログイン' do
         before do
           signin_as(second_account)
+          sleep(0.5)
         end
         it '管理者用ページのリンクが表示されていない' do
           expect(page).not_to have_link('admin-index')
