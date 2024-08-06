@@ -12,7 +12,7 @@
   <% end %>
   <%= render 'form', {post: @post, action: 'create-post'} %>
 </div>
-<div type="text/javascript">
+<div>
   <%= javascript_pack_tag 'map_new_post', 'data-turbolinks-track': 'reload' %>
   <%= javascript_pack_tag 'map_common', 'data-turbolinks-track': 'reload', type: "module" %>
   <script src="https://maps.googleapis.com/maps/api/js?language=ja&key=<%= ENV['GOOGLE_MAPS_API_KEY'] %>&callback=initMap" async defer></script>

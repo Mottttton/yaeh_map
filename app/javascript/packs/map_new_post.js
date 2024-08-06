@@ -6,11 +6,7 @@ let geocoder;
 let marker;
 let hasMarker = false;
 
-const searchLocationBtn = document.getElementById('search-location-btn')
-const locationButton = document.getElementById("current_location");
-
 function initNewPostMap() {
-
   function succeedGetCurrentPosition(position) {
     const pos = new google.maps.LatLng(
       position.coords.latitude,
@@ -77,6 +73,33 @@ function initNewPostMap() {
 
   geocoder = new google.maps.Geocoder()
   navigator.geolocation.getCurrentPosition(succeedGetCurrentPosition, failGetCurrentPosition);
+
+  const searchLocationBtn = document.getElementById('search-location-btn')
+  const locationBtn = document.getElementById("current_location");
+  // 現在地ボタンのイベント設定
+  locationBtn.addEventListener("click", moveCurrentLocation);
+  // 検索ボタンのイベント設定
+  searchLocationBtn.addEventListener("click", () => {
+    const inputAddress = document.getElementById('placeSearch').value;
+    geocoder.geocode( { 'address': inputAddress}, function(results, status) {
+      if (status == 'OK') {
+        // マーカーが複数できないようにする
+        if (hasMarker === true){
+          resetMarker();
+        }
+        //新しくマーカーを作成する
+        window.map.setCenter(results[0].geometry.location);
+        marker = placeMarker(results[0].geometry.location);
+        hasMarker = true;
+
+        //検索した時に緯度経度を入力する
+        inputLatLng(results[0].geometry.location);
+        inputPrefRegionPlaceId(results[0].geometry.location, geocoder);
+      } else {
+        alert('該当する結果がありませんでした：' + status);
+      }
+    });
+  });
 }
 
 // 現在地への移動
@@ -117,31 +140,8 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.open(map);
 }
 
-window.onload = function() {
-  inputRegion();
-  // 現在地ボタンのイベント設定
-  locationButton.addEventListener("click", moveCurrentLocation);
-  // 検索ボタンのイベント設定
-  searchLocationBtn.addEventListener("click", () => {
-    const inputAddress = document.getElementById('placeSearch').value;
-    geocoder.geocode( { 'address': inputAddress}, function(results, status) {
-      if (status == 'OK') {
-        // マーカーが複数できないようにする
-        if (hasMarker === true){
-          resetMarker();
-        }
-        //新しくマーカーを作成する
-        window.map.setCenter(results[0].geometry.location);
-        marker = placeMarker(results[0].geometry.location)
-        hasMarker = true;
-
-        //検索した時に緯度経度を入力する
-        inputLatLng(results[0].geometry.location);
-        inputPrefRegionPlaceId(results[0].geometry.location, geocoder)
-      } else {
-        alert('該当する結果がありませんでした：' + status);
-      }
-    });
-  });
-}
 window.initMap = initNewPostMap;
+
+document.addEventListener('turbolinks:load', () => {
+  window.initMap = initNewPostMap;
+})
