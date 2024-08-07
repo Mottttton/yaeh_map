@@ -41,6 +41,48 @@ a {
   margin-top: 56px;
 }
 
+#timeline {
+  & .col {
+    & .post {
+      & .carousel {
+        & .carousel-inner {
+          & .carousel-item {
+            & > img {
+              object-fit: cover;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@include media-breakpoint-up(sm) {
+  .carousel-inner {
+    min-height: 400px;
+  }
+}
+@include media-breakpoint-up(md) {
+  .carousel-inner {
+    min-height: 250px;
+  }
+}
+@include media-breakpoint-up(lg) {
+  .carousel-inner {
+    min-height: 340px;
+  }
+}
+@include media-breakpoint-up(xl) {
+  .carousel-inner {
+    min-height: 408px;
+  }
+}
+@include media-breakpoint-up(xxl) {
+  .carousel-inner {
+    min-height: 475px;
+  }
+}
+
 .account-name {
   height: 20px;
 }
