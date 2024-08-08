@@ -46,8 +46,12 @@ a {
     & .post {
       & .carousel {
         & .carousel-inner {
+          height: 220px;
           & .carousel-item {
+            height: 100%;
             & > img {
+              height: 100%;
+              width: 100%;
               object-fit: cover;
             }
           }
@@ -59,27 +63,27 @@ a {
 
 @include media-breakpoint-up(sm) {
   .carousel-inner {
-    min-height: 400px;
+    height: 261px;
   }
 }
 @include media-breakpoint-up(md) {
   .carousel-inner {
-    min-height: 250px;
+    height: 250px;
   }
 }
 @include media-breakpoint-up(lg) {
   .carousel-inner {
-    min-height: 340px;
+    height: 340px;
   }
 }
 @include media-breakpoint-up(xl) {
   .carousel-inner {
-    min-height: 408px;
+    height: 408px;
   }
 }
 @include media-breakpoint-up(xxl) {
   .carousel-inner {
-    min-height: 475px;
+    height: 475px;
   }
 }
 
