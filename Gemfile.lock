@@ -391,7 +391,7 @@ DEPENDENCIES
   bootstrap5-kaminari-views (~> 0.0.1)
   byebug
   cancancan
-  capistrano (~> 3.10)
+  capistrano (~> 3.19.0)
   capistrano-rails (~> 1.6)
   capistrano-rbenv (~> 2.2)
   capistrano-safe-deploy-to
