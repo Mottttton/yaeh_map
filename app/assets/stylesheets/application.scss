@@ -19,8 +19,25 @@ a {
 }
 
 // header
+@media (max-width: 991.98px) {
+  .navbar-expand-lg {
+    & .navbar-collapse {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+
+      & .navbar-nav {
+        position: relative;
+        & > .nav-item {
+          position: relative;
+        }
+      }
+    }
+  }
+}
 .dropdown-menu {
-  min-width: 15rem !important;
+  min-width: 20rem !important;
 }
 
 // map

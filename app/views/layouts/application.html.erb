@@ -18,55 +18,11 @@
           <% else %>
             <%= link_to "Yaeh Map", root_path, class: "navbar-brand"%>
           <% end %>
-          <div class="d-flex flex-row-reverse">
-            <% if current_page?(posts_path) %>
-              <div class="nav flex-nowrap align-items-center">
-                <div class="nav-item dropdown nav-search px-3">
-                  <a class="nav-link" role="button" href="#" id="navSearch" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-search fs-4"> </i>
-                  </a>
-                  <div class="dropdown-menu dropdown-menu-end navbar-nav-scroll shadow rounded p-2" aria-labelledby="navSearch">
-                    <%= search_form_for @q do |f| %>
-                      <div class="mb-3">
-                        <%= f.label :title_or_description_cont, 'キーワード', class: "form-label" %>
-                        <%= f.search_field :title_or_description_cont, class: "form-control" %>
-                      </div>
-                      <div class="mb-3">
-                        <%= f.label :region_eq, '地域' %>
-                        <%= f.select :region_eq, options_for_select(Region.regions), {include_blank: true}, {class: "form-select"} %>
-                      </div>
-                      <div class="mb-3">
-                        <div>都道府県</div>
-                        <% Prefecture.prefectures.each do |prefecture| %>
-                          <div class="form-check form-check-inline">
-                            <%= f.check_box :prefecture_eq_any, {multiple: true, include_hidden: false, class: "form-check-input"}, prefecture[1] %>
-                            <%= f.label prefecture[0], class: "form-check-label" %>
-                          </div>
-                        <% end %>
-                      </div>
-                      <div class="mb-3">
-                        <div><%= f.label :genre %></div>
-                        <% Post.genres.each do |genre| %>
-                          <div class="form-check form-check-inline">
-                            <%= f.check_box :genre_eq_any, {multiple: true, include_hidden: false, class: "form-check-input"}, genre[1] %>
-                            <%= f.label genre[0], class: "form-check-label" %>
-                          </div>
-                        <% end %>
-                      </div>
-                      <div class="d-flex justify-content-start">
-                        <%= f.submit class: "btn btn-secondary" %>
-                      </div>
-                    <% end %>
-                  </div>
-                </div>
-              </div>
-            <% end %>
-            <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-          </div>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav navbar-nav-scroll mx-auto">
+          <button class="navbar-toggler ms-auto collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse bg-body-secondary" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll px-3 container">
               <% if account_signed_in? %>
                 <li class="nav-item">
                   <%= link_to "アカウント", account_path(current_account.id), id: 'account-detail', class: 'nav-link' %>
@@ -95,6 +51,46 @@
               <% end %>
             </ul>
           </div>
+          <% if current_page?(posts_path) %>
+            <div class="nav-item dropdown nav-search px-3">
+              <a class="nav-link" role="button" href="#" id="navSearch" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-search fs-4"> </i>
+              </a>
+              <div class="dropdown-menu dropdown-menu-end navbar-nav-scroll shadow rounded p-2" aria-labelledby="navSearch">
+                <%= search_form_for @q do |f| %>
+                  <div class="mb-3">
+                    <%= f.label :title_or_description_cont, 'キーワード', class: "form-label" %>
+                    <%= f.search_field :title_or_description_cont, class: "form-control" %>
+                  </div>
+                  <div class="mb-3">
+                    <%= f.label :region_eq, '地域' %>
+                    <%= f.select :region_eq, options_for_select(Region.regions), {include_blank: true}, {class: "form-select"} %>
+                  </div>
+                  <div class="mb-3">
+                    <div>都道府県</div>
+                    <% Prefecture.prefectures.each do |prefecture| %>
+                      <div class="form-check form-check-inline">
+                        <%= f.check_box :prefecture_eq_any, {multiple: true, include_hidden: false, class: "form-check-input"}, prefecture[1] %>
+                        <%= f.label prefecture[0], class: "form-check-label" %>
+                      </div>
+                    <% end %>
+                  </div>
+                  <div class="mb-3">
+                    <div><%= f.label :genre %></div>
+                    <% Post.genres.each do |genre| %>
+                      <div class="form-check form-check-inline">
+                        <%= f.check_box :genre_eq_any, {multiple: true, include_hidden: false, class: "form-check-input"}, genre[1] %>
+                        <%= f.label genre[0], class: "form-check-label" %>
+                      </div>
+                    <% end %>
+                  </div>
+                  <div class="d-flex justify-content-start">
+                    <%= f.submit class: "btn btn-secondary" %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
         </div>
       </nav>
     </header>
