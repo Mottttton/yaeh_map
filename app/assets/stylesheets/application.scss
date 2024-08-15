@@ -18,6 +18,11 @@ a {
   text-decoration: none;
 }
 
+// header
+.dropdown-menu {
+  min-width: 15rem !important;
+}
+
 // map
 #map {
   height: 400px;
