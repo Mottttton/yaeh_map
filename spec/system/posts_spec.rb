@@ -222,6 +222,7 @@ RSpec.describe "Posts", type: :system do
         before do
           signin_as(no_region_account)
           sleep(0.5)
+          click_on('navSearch')
         end
         it 'タイムラインに全ての地域の投稿が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -232,6 +233,7 @@ RSpec.describe "Posts", type: :system do
         before do
           signin_as(set_region_account)
           sleep(0.5)
+          click_on('navSearch')
         end
         it '設定した地域の投稿のみ表示されている' do
           posts_in_timeline = find_by_id('timeline')
@@ -252,6 +254,7 @@ RSpec.describe "Posts", type: :system do
         before do
           signin_as(no_region_account)
           sleep(0.5)
+          click_on('navSearch')
         end
         it '検索したキーワードを全国から検索し表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -314,6 +317,7 @@ RSpec.describe "Posts", type: :system do
         before do
           signin_as(set_region_account)
           sleep(0.5)
+          click_on('navSearch')
         end
         it '検索したキーワードを全国から検索し表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -378,6 +382,7 @@ RSpec.describe "Posts", type: :system do
         before do
           signin_as(no_region_account)
           sleep(0.5)
+          click_on('navSearch')
         end
         it '選択した地域の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -394,6 +399,7 @@ RSpec.describe "Posts", type: :system do
         before do
           signin_as(set_region_account)
           sleep(0.5)
+          click_on('navSearch')
         end
         it '選択した地域の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -412,6 +418,7 @@ RSpec.describe "Posts", type: :system do
         before do
           signin_as(no_region_account)
           sleep(0.5)
+          click_on('navSearch')
         end
         it '選択した都道府県の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -482,6 +489,7 @@ RSpec.describe "Posts", type: :system do
         before do
           signin_as(set_region_account)
           sleep(0.5)
+          click_on('navSearch')
         end
         it '選択した都道府県の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -554,6 +562,7 @@ RSpec.describe "Posts", type: :system do
         before do
           signin_as(no_region_account)
           sleep(0.5)
+          click_on('navSearch')
         end
         it '選択した分類の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
@@ -616,6 +625,7 @@ RSpec.describe "Posts", type: :system do
         before do
           signin_as(set_region_account)
           sleep(0.5)
+          click_on('navSearch')
         end
         it '選択した分類の情報が表示される' do
           posts_in_timeline = find_by_id('timeline')
