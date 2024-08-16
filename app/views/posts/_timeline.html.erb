@@ -67,8 +67,15 @@
               <span class="badge bg-primary"><%= post.prefecture %></span>
             <% end %>
           </div>
-          <div class='mb-5 post-description'>
-            <p><%= post.description %></p>
+          <div class="post-group position-relative">
+            <div class='mb-5 post-description'>
+              <p><%= post.description %></p>
+            </div>
+            <div class="position-absolute top-100 start-50 translate-middle h-75 w-100 wrap-rgba-white">
+            </div>
+            <div class="d-grid col-6 position-absolute top-100 start-50 translate-middle">
+              <%= link_to t('common.show'), post_path(post.id), class: 'show-post btn btn-primary', role: 'button' %>
+            </div>
           </div>
           <div class="d-flex justify-content-between align-items-center">
             <div id="favorite-<%= post.id %>">
@@ -79,7 +86,6 @@
                 <%= link_to t('common.destroy'), post_path(post.id), method: :delete, data: {confirm: t('common.confirm_destroy')}, class: 'destroy-post btn btn-sm btn-outline-danger' %>
                 <%= link_to t('common.edit'), edit_post_path(post.id), class: 'edit-post btn btn-sm btn-outline-secondary' %>
               <% end %>
-              <%= link_to t('common.show'), post_path(post.id), class: 'show-post btn btn-sm btn-outline-secondary' %>
             </div>
           </div>
         </div>
