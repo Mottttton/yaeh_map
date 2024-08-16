@@ -123,17 +123,25 @@ a {
   width: 40px;
 }
 
-h2.card-title {
-  font-size: 1.5rem;
+.card-header {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .post-description {
   word-wrap: break-word;
-  min-height: 50px;
+  height: 100px;
+  overflow-y: hidden;
   & p {
     white-space: pre-wrap;
     text-align: justify;
+    text-overflow: ellipsis;
   }
+}
+
+.wrap-rgba-white {
+  background: rgba(255, 255, 255, 0.6);
 }
 
 // favorite
