@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_04_12_063500) do
-
+ActiveRecord::Schema[7.0].define(version: 2024_08_19_041720) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -19,16 +18,16 @@ ActiveRecord::Schema.define(version: 2024_04_12_063500) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at", precision: nil
+    t.datetime "remember_created_at", precision: nil
     t.string "name", null: false
     t.string "emailLstring"
     t.string "nickname", null: false
     t.integer "region"
     t.text "self_introduction"
     t.boolean "admin", default: false, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["email"], name: "index_accounts_on_email", unique: true
     t.index ["name"], name: "index_accounts_on_name", unique: true
     t.index ["reset_password_token"], name: "index_accounts_on_reset_password_token", unique: true
@@ -39,7 +38,7 @@ ActiveRecord::Schema.define(version: 2024_04_12_063500) do
     t.string "record_type", null: false
     t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
-    t.datetime "created_at", null: false
+    t.datetime "created_at", precision: nil, null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
@@ -51,8 +50,8 @@ ActiveRecord::Schema.define(version: 2024_04_12_063500) do
     t.text "metadata"
     t.string "service_name", null: false
     t.bigint "byte_size", null: false
-    t.string "checksum", null: false
-    t.datetime "created_at", null: false
+    t.string "checksum"
+    t.datetime "created_at", precision: nil, null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -66,8 +65,8 @@ ActiveRecord::Schema.define(version: 2024_04_12_063500) do
     t.bigint "account_id", null: false
     t.string "favoritable_type", null: false
     t.bigint "favoritable_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_favorites_on_account_id"
     t.index ["favoritable_type", "favoritable_id"], name: "index_favorites_on_favoritable"
   end
@@ -80,8 +79,8 @@ ActiveRecord::Schema.define(version: 2024_04_12_063500) do
     t.integer "genre", null: false
     t.string "place", null: false
     t.bigint "account_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.float "latitude", null: false
     t.float "longitude", null: false
     t.index ["account_id"], name: "index_posts_on_account_id"
@@ -92,8 +91,8 @@ ActiveRecord::Schema.define(version: 2024_04_12_063500) do
     t.bigint "account_id", null: false
     t.string "taggable_type", null: false
     t.bigint "taggable_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_tags_on_account_id"
     t.index ["taggable_type", "taggable_id"], name: "index_tags_on_taggable"
   end

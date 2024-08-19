@@ -4,7 +4,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '3.0.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
-gem 'rails', '~> 6.1.7', '>= 6.1.7.6'
+gem 'rails', '~> 7.0.8', '>= 7.0.8.4'
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.1'
 # Use Puma as the app server
@@ -42,6 +42,7 @@ gem 'jquery-rails'
 gem 'bootstrap5-kaminari-views', '~> 0.0.1'
 gem 'unicorn'
 gem 'aws-sdk-s3', require: false
+gem 'sprockets-rails'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

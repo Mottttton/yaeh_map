@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe "Posts", type: :system do
   include SigninMacro
   include CheckTimelineState
-
   describe '登録機能' do
     let!(:first_account) { FactoryBot.create(:first_account) }
     before do
@@ -19,6 +18,7 @@ RSpec.describe "Posts", type: :system do
         choose('post_genre_2')
         sleep(1)
         click_button("create-post") # [投稿する]ボタン
+        sleep(0.5)
         expect(page).to have_text('情報を登録しました')
         timeline = all("#timeline .post")
         expect(timeline[0].text).to have_text("現在地テスト")
@@ -36,6 +36,7 @@ RSpec.describe "Posts", type: :system do
         click_button("search-location-btn") # [検索]ボタン
         sleep(1)
         click_button("create-post") # [投稿する]ボタン
+        sleep(0.5)
         expect(page).to have_text('情報を登録しました')
         timeline = all("#timeline .post")
         expect(timeline[0].text).to have_text("東京駅")
@@ -60,6 +61,7 @@ RSpec.describe "Posts", type: :system do
         expect(find("#post_latitude", visible: false).value).not_to eq tokyo_sta_lat
         expect(find("#post_longitude", visible: false).value).not_to eq tokyo_sta_lng
         click_button("create-post") # [投稿する]ボタン
+        sleep(0.5)
         expect(page).to have_text('情報を登録しました')
         timeline = all("#timeline .post")
         expect(timeline[0].text).to have_text("現在地テスト")
@@ -95,6 +97,7 @@ RSpec.describe "Posts", type: :system do
         click_button("search-location-btn") # [検索]ボタン
         sleep(1)
         click_button("create-post") # [投稿する]ボタン
+        sleep(0.5)
 
         timeline = all("#timeline .post")
         expect(timeline[0].text).to have_text("スリップ注意")

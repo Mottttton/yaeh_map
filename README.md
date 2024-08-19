@@ -1,7 +1,7 @@
 # README
 ## 開発言語
 - Ruby 3.0.1
-- Rails 6.1.7.6
+- Rails 7.0.8.4
 ## インフラ
 - AWS EC2 & S3
 ## アプリケーションURL
