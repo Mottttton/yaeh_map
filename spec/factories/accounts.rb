@@ -3,6 +3,7 @@ FactoryBot.define do
     name { "taro" }
     email { "taro@sample.com" }
     nickname { "taro" }
+    region { 5 }
     self_introduction { "はじめまして、太郎です。バイク歴10年です。" }
     password { "password" }
     admin { true }
