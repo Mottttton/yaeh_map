@@ -1,13 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, type LocationQueryRaw, type LocationQueryValue } from 'vue-router'
 import { useMetaStore } from '../stores/meta'
 
 const route = useRoute()
 const router = useRouter()
 const meta = useMetaStore()
 
-const form = reactive({
+interface SearchForm {
+  keyword: string
+  region: number | string
+  prefectures: number[]
+  genres: number[]
+}
+
+const form = reactive<SearchForm>({
   keyword: '',
   region: '',
   prefectures: [],
@@ -17,19 +24,19 @@ const form = reactive({
 onMounted(async () => {
   await meta.ensureLoaded()
   // URL のクエリから検索条件を復元する
-  form.keyword = route.query.keyword || ''
-  form.region = route.query.region ?? ''
+  form.keyword = typeof route.query.keyword === 'string' ? route.query.keyword : ''
+  form.region = typeof route.query.region === 'string' ? route.query.region : ''
   form.prefectures = toArray(route.query.prefs).map(Number)
   form.genres = toArray(route.query.genres).map(Number)
 })
 
-function toArray(value) {
+function toArray(value: LocationQueryValue | LocationQueryValue[] | undefined): LocationQueryValue[] {
   if (value == null) return []
   return Array.isArray(value) ? value : [value]
 }
 
 function submit() {
-  const query = {}
+  const query: LocationQueryRaw = {}
   if (form.keyword) query.keyword = form.keyword
   if (form.region !== '' && form.region != null) query.region = form.region
   if (form.prefectures.length) query.prefs = form.prefectures

@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
 import { authApi } from '../api'
+import type { SessionAccount } from '../types'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    account: null,
+    account: null as SessionAccount | null,
     initialized: false
   }),
   getters: {
@@ -22,7 +23,7 @@ export const useAuthStore = defineStore('auth', {
         this.initialized = true
       }
     },
-    setAccount(account) {
+    setAccount(account: SessionAccount | null) {
       this.account = account
     },
     clear() {

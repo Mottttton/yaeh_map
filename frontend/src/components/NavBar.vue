@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -39,7 +39,7 @@ async function logout() {
       </button>
       <div class="collapse navbar-collapse bg-body-secondary" id="navbarCollapse">
         <ul class="navbar-nav navbar-nav-scroll px-3 container">
-          <template v-if="auth.signedIn">
+          <template v-if="auth.account">
             <li class="nav-item">
               <router-link id="account-detail" class="nav-link" :to="{ name: 'account-show', params: { id: auth.account.id } }">アカウント</router-link>
             </li>

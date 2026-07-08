@@ -1,9 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { authApi } from '../api'
+import { extractErrors } from '../api/errors'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -16,7 +17,7 @@ const form = reactive({
   password_confirmation: '',
   current_password: ''
 })
-const errors = ref([])
+const errors = ref<string[]>([])
 const submitting = ref(false)
 
 onMounted(() => {
@@ -33,7 +34,7 @@ async function updateCredentials() {
     flash.notice(data.message)
     router.push({ name: 'account-show', params: { id: data.account.id } })
   } catch (error) {
-    errors.value = error.response?.data?.errors || ['更新に失敗しました']
+    errors.value = extractErrors(error, '更新に失敗しました')
   } finally {
     submitting.value = false
   }

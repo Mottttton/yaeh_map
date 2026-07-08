@@ -1,9 +1,15 @@
-<script setup>
-defineProps({
-  url: { type: String, default: null },
-  // 'timeline'(40px) | 'profile'(120px)
-  size: { type: String, default: 'timeline' }
-})
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    url?: string | null
+    // 'timeline'(40px) | 'profile'(120px)
+    size?: 'timeline' | 'profile'
+  }>(),
+  {
+    url: null,
+    size: 'timeline'
+  }
+)
 </script>
 
 <template>

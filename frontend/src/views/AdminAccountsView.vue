@@ -1,16 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useFlashStore } from '../stores/flash'
 import { adminApi } from '../api'
 import PaginationBar from '../components/PaginationBar.vue'
+import type { AdminAccount, PaginationMeta } from '../types'
 
 const route = useRoute()
 const router = useRouter()
 const flash = useFlashStore()
 
-const accounts = ref([])
-const meta = ref({ current_page: 1, total_pages: 1 })
+const accounts = ref<AdminAccount[]>([])
+const meta = ref<PaginationMeta>({ current_page: 1, total_pages: 1, total_count: 0, per_page: 0 })
 
 async function fetchAccounts() {
   const { data } = await adminApi.accounts({ page: route.query.page })
@@ -20,18 +21,18 @@ async function fetchAccounts() {
 
 watch(() => route.query.page, fetchAccounts, { immediate: true })
 
-function changePage(page) {
+function changePage(page: number) {
   router.push({ name: 'admin', query: { page } })
 }
 
-async function destroyAccount(account) {
+async function destroyAccount(account: AdminAccount) {
   if (!window.confirm(`アカウント「@${account.name}」を削除しますか？投稿・いいねも全て削除されます。`)) return
   const { data } = await adminApi.destroyAccount(account.id)
   flash.notice(data.message)
   fetchAccounts()
 }
 
-function formatDate(iso) {
+function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ja-JP')
 }
 </script>

@@ -1,10 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { useMetaStore } from '../stores/meta'
 import { authApi } from '../api'
+import { extractErrors } from '../api/errors'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -20,16 +21,17 @@ const form = reactive({
   password: '',
   password_confirmation: ''
 })
-const portraitFile = ref(null)
-const errors = ref([])
+const portraitFile = ref<File | null>(null)
+const errors = ref<string[]>([])
 const submitting = ref(false)
 
 onMounted(() => {
   meta.ensureLoaded()
 })
 
-function onPortraitChange(event) {
-  portraitFile.value = event.target.files[0] || null
+function onPortraitChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  portraitFile.value = input.files?.[0] || null
 }
 
 async function signup() {
@@ -50,7 +52,7 @@ async function signup() {
     flash.notice(data.message)
     router.push({ name: 'posts' })
   } catch (error) {
-    errors.value = error.response?.data?.errors || ['登録に失敗しました']
+    errors.value = extractErrors(error, '登録に失敗しました')
   } finally {
     submitting.value = false
   }

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useFlashStore } from '../stores/flash'
 
 const flash = useFlashStore()

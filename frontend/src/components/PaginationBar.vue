@@ -1,24 +1,22 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
+import type { PaginationMeta } from '../types'
 
-const props = defineProps({
-  // { current_page, total_pages, total_count, per_page }
-  meta: { type: Object, required: true }
-})
-const emit = defineEmits(['change'])
+const props = defineProps<{ meta: PaginationMeta }>()
+const emit = defineEmits<{ change: [page: number] }>()
 
 const pages = computed(() => {
   const current = props.meta.current_page
   const total = props.meta.total_pages
   const windowSize = 2
-  const result = []
+  const result: number[] = []
   for (let page = Math.max(1, current - windowSize); page <= Math.min(total, current + windowSize); page++) {
     result.push(page)
   }
   return result
 })
 
-function goTo(page) {
+function goTo(page: number) {
   if (page < 1 || page > props.meta.total_pages || page === props.meta.current_page) return
   emit('change', page)
 }

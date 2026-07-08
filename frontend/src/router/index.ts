@@ -1,10 +1,21 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { setOnUnauthorized } from '../api/client'
 import TopView from '../views/TopView.vue'
 
-const routes = [
+declare module 'vue-router' {
+  interface RouteMeta {
+    /** 未ログインでも閲覧可能なページ */
+    public?: boolean
+    /** ログイン済みならリダイレクトするページ（ログイン・新規登録） */
+    guestOnly?: boolean
+    /** 管理者のみ閲覧可能なページ */
+    adminOnly?: boolean
+  }
+}
+
+const routes: RouteRecordRaw[] = [
   { path: '/', name: 'top', component: TopView, meta: { public: true } },
   { path: '/login', name: 'login', component: () => import('../views/LoginView.vue'), meta: { public: true, guestOnly: true } },
   { path: '/signup', name: 'signup', component: () => import('../views/SignupView.vue'), meta: { public: true, guestOnly: true } },

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useFlashStore } from '../stores/flash'
 import { authApi } from '../api'

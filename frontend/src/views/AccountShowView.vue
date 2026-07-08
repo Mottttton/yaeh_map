@@ -1,24 +1,23 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { accountsApi } from '../api'
 import PortraitIcon from '../components/PortraitIcon.vue'
 import PostTimeline from '../components/PostTimeline.vue'
+import type { AccountProfile, PaginationMeta, Post } from '../types'
 
-const props = defineProps({
-  id: { type: String, required: true }
-})
+const props = defineProps<{ id: string }>()
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 
-const account = ref(null)
-const posts = ref([])
-const meta = ref({ current_page: 1, total_pages: 1 })
+const account = ref<AccountProfile | null>(null)
+const posts = ref<Post[]>([])
+const meta = ref<PaginationMeta>({ current_page: 1, total_pages: 1, total_count: 0, per_page: 0 })
 
-const isOwn = computed(() => account.value && auth.account?.id === account.value.id)
+const isOwn = computed(() => !!account.value && auth.account?.id === account.value.id)
 
 async function fetchAccount() {
   const { data } = await accountsApi.show(props.id, { page: route.query.page })
@@ -29,7 +28,7 @@ async function fetchAccount() {
 
 watch(() => [props.id, route.query.page], fetchAccount, { immediate: true })
 
-function changePage(page) {
+function changePage(page: number) {
   router.push({ name: 'account-show', params: { id: props.id }, query: { page } })
 }
 </script>

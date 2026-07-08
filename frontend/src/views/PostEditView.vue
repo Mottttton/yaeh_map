@@ -1,19 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFlashStore } from '../stores/flash'
 import { postsApi } from '../api'
+import { extractErrors } from '../api/errors'
 import PostForm from '../components/PostForm.vue'
+import type { Post } from '../types'
 
-const props = defineProps({
-  id: { type: String, required: true }
-})
+const props = defineProps<{ id: string }>()
 
 const router = useRouter()
 const flash = useFlashStore()
 
-const post = ref(null)
-const errors = ref([])
+const post = ref<Post | null>(null)
+const errors = ref<string[]>([])
 const submitting = ref(false)
 
 onMounted(async () => {
@@ -21,7 +21,7 @@ onMounted(async () => {
   post.value = data.post
 })
 
-async function updatePost(formData) {
+async function updatePost(formData: FormData) {
   submitting.value = true
   errors.value = []
   try {
@@ -29,7 +29,7 @@ async function updatePost(formData) {
     flash.notice(data.message)
     router.push({ name: 'post-show', params: { id: props.id } })
   } catch (error) {
-    errors.value = error.response?.data?.errors || ['情報の更新に失敗しました']
+    errors.value = extractErrors(error, '情報の更新に失敗しました')
     window.scrollTo({ top: 0 })
   } finally {
     submitting.value = false

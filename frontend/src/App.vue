@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import NavBar from './components/NavBar.vue'
 import FlashMessages from './components/FlashMessages.vue'
 </script>

@@ -1,34 +1,42 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { loadGoogleMaps, googleMapsApiKey } from '../utils/googleMaps'
 import { useMetaStore } from '../stores/meta'
+import type { MapLocation } from '../types'
 
-const props = defineProps({
-  initialLatitude: { type: Number, default: null },
-  initialLongitude: { type: Number, default: null },
-  // 新規投稿では地図の初期位置（現在地）もフォームへ反映する（旧 map_new_post.js の挙動）
-  emitInitialLocation: { type: Boolean, default: false }
-})
-const emit = defineEmits(['location-selected'])
+const props = withDefaults(
+  defineProps<{
+    initialLatitude?: number | null
+    initialLongitude?: number | null
+    // 新規投稿では地図の初期位置（現在地）もフォームへ反映する（旧 map_new_post.js の挙動）
+    emitInitialLocation?: boolean
+  }>(),
+  {
+    initialLatitude: null,
+    initialLongitude: null,
+    emitInitialLocation: false
+  }
+)
+const emit = defineEmits<{ 'location-selected': [location: MapLocation] }>()
 
 const meta = useMetaStore()
-const mapElement = ref(null)
+const mapElement = ref<HTMLDivElement | null>(null)
 const searchWord = ref('')
 const mapAvailable = ref(!!googleMapsApiKey)
 
-let google = null
-let map = null
-let marker = null
-let geocoder = null
+let gmaps: typeof google | null = null
+let map: google.maps.Map | null = null
+let marker: google.maps.Marker | null = null
+let geocoder: google.maps.Geocoder | null = null
 
 const TOKYO_STATION = { lat: 35.6803997, lng: 139.7690174 }
 
 onMounted(async () => {
   await meta.ensureLoaded()
-  google = await loadGoogleMaps()
-  if (!google) return // API キー未設定 → 地図なしで動作を続ける
+  gmaps = await loadGoogleMaps()
+  if (!gmaps) return // API キー未設定 → 地図なしで動作を続ける
 
-  geocoder = new google.maps.Geocoder()
+  geocoder = new gmaps.maps.Geocoder()
 
   if (props.initialLatitude != null && props.initialLongitude != null) {
     // 編集時: 登録済みの地点を表示
@@ -45,33 +53,36 @@ onMounted(async () => {
   }
 })
 
-function initMap(center, { withMarker, emitLocation }) {
-  map = new google.maps.Map(mapElement.value, { center, zoom: 15 })
-  const latLng = new google.maps.LatLng(center.lat, center.lng)
+function initMap(center: google.maps.LatLngLiteral, { withMarker, emitLocation }: { withMarker: boolean; emitLocation: boolean }) {
+  if (!gmaps || !mapElement.value) return
+  map = new gmaps.maps.Map(mapElement.value, { center, zoom: 15 })
+  const latLng = new gmaps.maps.LatLng(center.lat, center.lng)
   if (withMarker) placeMarker(latLng)
   if (emitLocation) resolveAndEmit(latLng)
-  map.addListener('click', (event) => {
-    selectLocation(event.latLng)
+  map.addListener('click', (event: google.maps.MapMouseEvent) => {
+    if (event.latLng) selectLocation(event.latLng)
   })
 }
 
-function placeMarker(latLng) {
+function placeMarker(latLng: google.maps.LatLng) {
+  if (!gmaps || !map) return
   if (marker) marker.setMap(null)
-  marker = new google.maps.Marker({ map, position: latLng, draggable: true })
+  marker = new gmaps.maps.Marker({ map, position: latLng, draggable: true })
   // マーカーのドロップ（ドラッグ終了）時にも位置情報を更新する
-  marker.addListener('dragend', (event) => {
-    selectLocation(event.latLng, { pan: false })
+  marker.addListener('dragend', (event: google.maps.MapMouseEvent) => {
+    if (event.latLng) selectLocation(event.latLng, { pan: false })
   })
 }
 
-function selectLocation(latLng, { pan = true } = {}) {
-  if (pan) map.panTo(latLng)
+function selectLocation(latLng: google.maps.LatLng, { pan = true } = {}) {
+  if (pan) map?.panTo(latLng)
   placeMarker(latLng)
   resolveAndEmit(latLng)
 }
 
 // 逆ジオコーディングで都道府県・地域・place_id を取得してフォームへ反映する
-function resolveAndEmit(latLng) {
+function resolveAndEmit(latLng: google.maps.LatLng) {
+  if (!geocoder) return
   geocoder.geocode({ location: latLng }, (results, status) => {
     if (status !== 'OK' || !results?.length) {
       emit('location-selected', {
@@ -90,7 +101,7 @@ function resolveAndEmit(latLng) {
     emit('location-selected', {
       latitude: latLng.lat(),
       longitude: latLng.lng(),
-      place: results[0].place_id,
+      place: results[0].place_id ?? '',
       prefecture: known ? prefecture : '',
       region: known ? meta.prefectureToRegion[prefecture] : ''
     })
@@ -101,7 +112,8 @@ function resolveAndEmit(latLng) {
 function moveToCurrentLocation() {
   if (!navigator.geolocation || !map) return
   navigator.geolocation.getCurrentPosition((position) => {
-    const latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+    if (!gmaps || !map) return
+    const latLng = new gmaps.maps.LatLng(position.coords.latitude, position.coords.longitude)
     map.setCenter(latLng)
     resolveAndEmit(latLng)
   })
@@ -113,7 +125,7 @@ function searchLocation() {
   geocoder.geocode({ address: searchWord.value }, (results, status) => {
     if (status === 'OK' && results?.length) {
       const location = results[0].geometry.location
-      map.setCenter(location)
+      map?.setCenter(location)
       placeMarker(location)
       resolveAndEmit(location)
     } else {

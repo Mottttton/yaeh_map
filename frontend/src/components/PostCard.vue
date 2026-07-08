@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
@@ -7,11 +7,10 @@ import { staticMapUrl } from '../utils/googleMaps'
 import { timeAgoInWords } from '../utils/timeAgo'
 import FavoriteButton from './FavoriteButton.vue'
 import PortraitIcon from './PortraitIcon.vue'
+import type { FavoriteState, Post } from '../types'
 
-const props = defineProps({
-  post: { type: Object, required: true }
-})
-const emit = defineEmits(['deleted'])
+const props = defineProps<{ post: Post }>()
+const emit = defineEmits<{ deleted: [id: number] }>()
 
 const auth = useAuthStore()
 const flash = useFlashStore()
@@ -22,7 +21,7 @@ const mapImage = computed(() => staticMapUrl(props.post.latitude, props.post.lon
 const totalSlides = computed(() => props.post.photos.length + 1)
 
 // いいねの状態は一覧・詳細で共有する post オブジェクトへ反映する
-function onFavoriteUpdated(state) {
+function onFavoriteUpdated(state: FavoriteState) {
   props.post.favorited = state.favorited
   props.post.favorites_count = state.favorites_count
 }
@@ -47,7 +46,7 @@ async function destroyPost() {
           :data-bs-target="`#carousel-post-${post.id}`"
           :data-bs-slide-to="index - 1"
           :class="{ active: index === 1 }"
-          :aria-current="index === 1 ? 'true' : null"
+          :aria-current="index === 1 ? 'true' : undefined"
           :aria-label="`Slide ${index}`"
         ></button>
       </div>

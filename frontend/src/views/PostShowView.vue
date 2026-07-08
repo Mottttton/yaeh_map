@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -8,33 +8,34 @@ import { embedMapUrl, googleMapsLinkUrl } from '../utils/googleMaps'
 import { timeAgoInWords } from '../utils/timeAgo'
 import FavoriteButton from '../components/FavoriteButton.vue'
 import PortraitIcon from '../components/PortraitIcon.vue'
+import type { FavoriteState, Post } from '../types'
 
-const props = defineProps({
-  id: { type: String, required: true }
-})
+const props = defineProps<{ id: string }>()
 
 const router = useRouter()
 const auth = useAuthStore()
 const flash = useFlashStore()
 
-const post = ref(null)
+const post = ref<Post | null>(null)
 
-const isOwner = computed(() => post.value && auth.account?.id === post.value.account.id)
+const isOwner = computed(() => !!post.value && auth.account?.id === post.value.account.id)
 const canModerate = computed(() => isOwner.value || auth.isAdmin)
-const embedUrl = computed(() => post.value && embedMapUrl(post.value.place, post.value.latitude, post.value.longitude))
-const externalMapUrl = computed(() => post.value && googleMapsLinkUrl(post.value.latitude, post.value.longitude))
+const embedUrl = computed(() => (post.value ? embedMapUrl(post.value.place, post.value.latitude, post.value.longitude) : null))
+const externalMapUrl = computed(() => (post.value ? googleMapsLinkUrl(post.value.latitude, post.value.longitude) : ''))
 
 onMounted(async () => {
   const { data } = await postsApi.show(props.id)
   post.value = data.post
 })
 
-function onFavoriteUpdated(state) {
+function onFavoriteUpdated(state: FavoriteState) {
+  if (!post.value) return
   post.value.favorited = state.favorited
   post.value.favorites_count = state.favorites_count
 }
 
 async function destroyPost() {
+  if (!post.value) return
   if (!window.confirm('本当に削除してもよろしいですか？')) return
   const { data } = await postsApi.destroy(post.value.id)
   flash.notice(data.message)

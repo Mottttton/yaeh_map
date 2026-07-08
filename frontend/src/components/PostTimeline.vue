@@ -1,12 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import PostCard from './PostCard.vue'
 import PaginationBar from './PaginationBar.vue'
+import type { PaginationMeta, Post } from '../types'
 
-defineProps({
-  posts: { type: Array, required: true },
-  meta: { type: Object, required: true }
-})
-defineEmits(['page-change', 'deleted'])
+defineProps<{ posts: Post[]; meta: PaginationMeta }>()
+defineEmits<{ 'page-change': [page: number]; deleted: [id: number] }>()
 </script>
 
 <template>

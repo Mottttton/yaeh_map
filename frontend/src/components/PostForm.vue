@@ -1,18 +1,36 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useMetaStore } from '../stores/meta'
 import MapPicker from './MapPicker.vue'
+import type { MapLocation, Post } from '../types'
 
-const props = defineProps({
-  mode: { type: String, required: true }, // 'new' | 'edit'
-  initialPost: { type: Object, default: null },
-  submitting: { type: Boolean, default: false }
-})
-const emit = defineEmits(['submit'])
+const props = withDefaults(
+  defineProps<{
+    mode: 'new' | 'edit'
+    initialPost?: Post | null
+    submitting?: boolean
+  }>(),
+  {
+    initialPost: null,
+    submitting: false
+  }
+)
+const emit = defineEmits<{ submit: [formData: FormData] }>()
 
 const meta = useMetaStore()
 
-const form = reactive({
+interface PostFormState {
+  title: string
+  description: string
+  genre: string
+  prefecture: string
+  region: string
+  place: string
+  latitude: number | ''
+  longitude: number | ''
+}
+
+const form = reactive<PostFormState>({
   title: '',
   description: '',
   genre: '',
@@ -22,7 +40,7 @@ const form = reactive({
   latitude: '',
   longitude: ''
 })
-const photoFiles = ref([])
+const photoFiles = ref<File[]>([])
 
 onMounted(async () => {
   await meta.ensureLoaded()
@@ -39,7 +57,7 @@ onMounted(async () => {
 })
 
 // 地図から位置が選択されたらフォームへ反映（旧 map_common.js の hidden フィールド入力に相当）
-function onLocationSelected(location) {
+function onLocationSelected(location: MapLocation) {
   form.latitude = location.latitude
   form.longitude = location.longitude
   if (location.place) form.place = location.place
@@ -53,8 +71,9 @@ function onPrefectureChange() {
   if (region) form.region = region
 }
 
-function onFilesChange(event) {
-  photoFiles.value = Array.from(event.target.files)
+function onFilesChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  photoFiles.value = Array.from(input.files ?? [])
 }
 
 function submit() {
@@ -65,8 +84,8 @@ function submit() {
   formData.append('post[region]', form.region)
   formData.append('post[prefecture]', form.prefecture)
   formData.append('post[place]', form.place)
-  formData.append('post[latitude]', form.latitude)
-  formData.append('post[longitude]', form.longitude)
+  formData.append('post[latitude]', String(form.latitude))
+  formData.append('post[longitude]', String(form.longitude))
   // ファイルを選び直した場合のみ写真を送信する（既存の写真は置き換えになる）
   photoFiles.value.forEach((file) => formData.append('post[photos][]', file))
   emit('submit', formData)

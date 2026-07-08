@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
 import { metaApi } from '../api'
+import type { MetaOption } from '../types'
 
 // バックエンドの enum 定義（地域・都道府県・分類）を保持するストア
 export const useMetaStore = defineStore('meta', {
   state: () => ({
-    regions: [],
-    prefectures: [],
-    genres: [],
-    prefectureToRegion: {},
+    regions: [] as MetaOption[],
+    prefectures: [] as MetaOption[],
+    genres: [] as MetaOption[],
+    prefectureToRegion: {} as Record<string, string>,
     loaded: false
   }),
   actions: {

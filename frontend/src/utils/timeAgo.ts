@@ -1,5 +1,5 @@
 // 旧 Rails の time_ago_in_words（ja ロケール）相当の簡易実装
-export function timeAgoInWords(iso) {
+export function timeAgoInWords(iso: string): string {
   const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
   if (seconds < 60) return `${Math.max(seconds, 1)}秒前`
   const minutes = Math.floor(seconds / 60)

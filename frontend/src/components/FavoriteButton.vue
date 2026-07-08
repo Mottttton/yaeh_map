@@ -1,10 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { favoritesApi } from '../api'
+import type { FavoriteState, Post } from '../types'
 
-const props = defineProps({
-  post: { type: Object, required: true }
-})
-const emit = defineEmits(['updated'])
+const props = defineProps<{ post: Post }>()
+const emit = defineEmits<{ updated: [state: FavoriteState] }>()
 
 async function toggle() {
   const request = props.post.favorited ? favoritesApi.destroy : favoritesApi.create

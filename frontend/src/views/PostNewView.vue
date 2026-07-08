@@ -1,17 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useFlashStore } from '../stores/flash'
 import { postsApi } from '../api'
+import { extractErrors } from '../api/errors'
 import PostForm from '../components/PostForm.vue'
 
 const router = useRouter()
 const flash = useFlashStore()
 
-const errors = ref([])
+const errors = ref<string[]>([])
 const submitting = ref(false)
 
-async function createPost(formData) {
+async function createPost(formData: FormData) {
   submitting.value = true
   errors.value = []
   try {
@@ -19,7 +20,7 @@ async function createPost(formData) {
     flash.notice(data.message)
     router.push({ name: 'posts' })
   } catch (error) {
-    errors.value = error.response?.data?.errors || ['情報の登録に失敗しました']
+    errors.value = extractErrors(error, '情報の登録に失敗しました')
     window.scrollTo({ top: 0 })
   } finally {
     submitting.value = false

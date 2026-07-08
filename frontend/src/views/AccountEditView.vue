@@ -1,15 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { useMetaStore } from '../stores/meta'
 import { accountsApi } from '../api'
+import { extractErrors } from '../api/errors'
 import PortraitIcon from '../components/PortraitIcon.vue'
 
-const props = defineProps({
-  id: { type: String, required: true }
-})
+const props = defineProps<{ id: string }>()
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -17,9 +16,9 @@ const flash = useFlashStore()
 const meta = useMetaStore()
 
 const form = reactive({ nickname: '', region: '', self_introduction: '' })
-const portraitUrl = ref(null)
-const portraitFile = ref(null)
-const errors = ref([])
+const portraitUrl = ref<string | null>(null)
+const portraitFile = ref<File | null>(null)
+const errors = ref<string[]>([])
 const submitting = ref(false)
 
 onMounted(async () => {
@@ -36,8 +35,9 @@ onMounted(async () => {
   portraitUrl.value = data.account.portrait_url
 })
 
-function onPortraitChange(event) {
-  portraitFile.value = event.target.files[0] || null
+function onPortraitChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  portraitFile.value = input.files?.[0] || null
 }
 
 async function updateProfile() {
@@ -53,7 +53,7 @@ async function updateProfile() {
     flash.notice(data.message)
     router.push({ name: 'account-show', params: { id: props.id } })
   } catch (error) {
-    errors.value = error.response?.data?.errors || ['更新に失敗しました']
+    errors.value = extractErrors(error, '更新に失敗しました')
   } finally {
     submitting.value = false
   }

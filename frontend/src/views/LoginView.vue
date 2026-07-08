@@ -1,9 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { authApi } from '../api'
+import { extractErrorMessage } from '../api/errors'
 
 const route = useRoute()
 const router = useRouter()
@@ -21,9 +22,10 @@ async function login() {
     const { data } = await authApi.login(form)
     auth.setAccount(data.account)
     flash.notice(data.message)
-    router.push(route.query.redirect || { name: 'posts' })
+    const redirect = route.query.redirect
+    router.push(typeof redirect === 'string' ? redirect : { name: 'posts' })
   } catch (error) {
-    errorMessage.value = error.response?.data?.error || 'ログインに失敗しました'
+    errorMessage.value = extractErrorMessage(error, 'ログインに失敗しました')
   } finally {
     submitting.value = false
   }

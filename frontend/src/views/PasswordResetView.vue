@@ -1,15 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useFlashStore } from '../stores/flash'
 import { authApi } from '../api'
+import { extractErrors } from '../api/errors'
 
 const route = useRoute()
 const router = useRouter()
 const flash = useFlashStore()
 
 const form = reactive({ password: '', password_confirmation: '' })
-const errors = ref([])
+const errors = ref<string[]>([])
 const submitting = ref(false)
 
 async function resetPassword() {
@@ -17,14 +18,14 @@ async function resetPassword() {
   errors.value = []
   try {
     const { data } = await authApi.resetPassword({
-      reset_password_token: route.query.reset_password_token,
+      reset_password_token: String(route.query.reset_password_token ?? ''),
       password: form.password,
       password_confirmation: form.password_confirmation
     })
     flash.notice(data.message)
     router.push({ name: 'login' })
   } catch (error) {
-    errors.value = error.response?.data?.errors || ['パスワードの変更に失敗しました']
+    errors.value = extractErrors(error, 'パスワードの変更に失敗しました')
   } finally {
     submitting.value = false
   }

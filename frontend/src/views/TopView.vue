@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import appExample from '../assets/app_example.png'
 </script>
 
