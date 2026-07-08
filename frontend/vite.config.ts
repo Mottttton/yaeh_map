@@ -1,13 +1,14 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
 
 // Rails API サーバのオリジン（開発時の proxy 先）。
 // Rails を別ポートで動かす場合は VITE_API_ORIGIN で上書きする。
 const apiOrigin = process.env.VITE_API_ORIGIN || 'http://localhost:3000'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
