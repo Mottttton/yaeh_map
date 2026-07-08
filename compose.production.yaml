@@ -1,0 +1,47 @@
+# 本番用イメージ(Dockerfile)をローカルで動作確認するための Compose 設定。
+# 実際のデプロイ(ECS / Cloud Run 等)ではこのファイルは使わず、Dockerfile のイメージを直接使う。
+#
+# 起動:
+#   RAILS_MASTER_KEY="$(cat config/master.key)" docker compose -f compose.production.yaml up --build
+#
+# 確認: http://localhost:${APP_PORT:-8080}
+# Google Maps を確認する場合は VITE_GOOGLE_MAPS_API_KEY も環境変数で渡す。
+
+name: yaeh_map_prod
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: yaeh_map_production
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      args:
+        VITE_GOOGLE_MAPS_API_KEY: ${VITE_GOOGLE_MAPS_API_KEY:-}
+    environment:
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
+      # master.key がない環境では SECRET_KEY_BASE を直接渡してもよい
+      # 例: SECRET_KEY_BASE=$(openssl rand -hex 64)
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-}
+      DATABASE_HOST: db
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: password
+    ports:
+      - "${APP_PORT:-8080}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db-data:

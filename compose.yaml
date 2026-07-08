@@ -1,0 +1,78 @@
+# ローカル開発用の Docker Compose 設定
+#
+# 起動: bin/docker-dev          … 空きポートを自動選択して起動（推奨）
+#       docker compose up       … デフォルトポート(3000/5173)で起動
+#       API_PORT=3001 WEB_PORT=5273 docker compose up … ポートを指定して起動
+#
+# 2セット同時に動かす場合はプロジェクト名も変える:
+#       COMPOSE_PROJECT_NAME=yaeh_map2 bin/docker-dev
+#
+# - アプリ本体:   http://localhost:${WEB_PORT:-5173}
+# - Rails API:    http://localhost:${API_PORT:-3000}/api/v1
+# - メール確認:   http://localhost:${API_PORT:-3000}/letter_opener
+
+name: yaeh_map
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    # ホスト側の PostgreSQL と競合しないよう、ポートはホストへ公開しない。
+    # DB に直接入りたい場合: docker compose exec db psql -U postgres yaeh_map_development
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # ホストと同じポートでコンテナ内でも待ち受ける（ポート番号のずれを無くすため）
+    command: >
+      sh -c "bundle check || bundle install;
+             rm -f tmp/pids/server.pid;
+             bin/rails db:prepare &&
+             bin/rails server -b 0.0.0.0 -p ${API_PORT:-3000}"
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: password
+    ports:
+      - "${API_PORT:-3000}:${API_PORT:-3000}"
+    volumes:
+      - .:/app
+      - bundle:/usr/local/bundle
+    depends_on:
+      db:
+        condition: service_healthy
+    # binding.irb / debug gem を使えるようにする
+    tty: true
+    stdin_open: true
+
+  web:
+    image: node:22-slim
+    working_dir: /app
+    command: >
+      sh -c "npm install &&
+             npm run dev -- --host 0.0.0.0 --port ${WEB_PORT:-5173}"
+    environment:
+      # Vite の proxy 先（コンテナ間通信なのでサービス名で参照する）
+      VITE_API_ORIGIN: http://api:${API_PORT:-3000}
+    ports:
+      - "${WEB_PORT:-5173}:${WEB_PORT:-5173}"
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    depends_on:
+      - api
+
+volumes:
+  db-data:
+  bundle:
+  node_modules:

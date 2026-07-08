@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  # コンテナ・ロードバランサ(ALB等)のヘルスチェック用。アプリが起動していれば 200 を返す
+  # （SPA の catch-all より先に定義する必要がある）
+  get "up" => "rails/health#show", as: :rails_health_check
+
   # Devise のマッピング（warden の scope :account）だけ登録し、ルートは /api/v1 配下に自前で定義する
   devise_for :accounts, skip: :all
 

@@ -1,0 +1,40 @@
+#!/usr/bin/env sh
+# 開発用コンテナを起動する。
+# API_PORT / WEB_PORT が未指定の場合、使用中のポートを避けて空きポートを自動で選ぶ。
+#
+# 使い方:
+#   bin/docker-dev                 # 起動（引数は docker compose up にそのまま渡る）
+#   bin/docker-dev -d              # バックグラウンド起動
+#   API_PORT=3001 bin/docker-dev   # ポートを固定したい場合
+#
+# 同じリポジトリで2セット目を起動する場合はプロジェクト名を変える:
+#   COMPOSE_PROJECT_NAME=yaeh_map2 bin/docker-dev
+
+set -e
+
+port_in_use() {
+  if command -v lsof >/dev/null 2>&1; then
+    lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1
+  else
+    nc -z 127.0.0.1 "$1" >/dev/null 2>&1
+  fi
+}
+
+# $1 から順に空いているポートを探す
+find_free_port() {
+  p="$1"
+  while port_in_use "$p"; do
+    p=$((p + 1))
+  done
+  printf '%s' "$p"
+}
+
+API_PORT="${API_PORT:-$(find_free_port 3000)}"
+WEB_PORT="${WEB_PORT:-$(find_free_port 5173)}"
+export API_PORT WEB_PORT
+
+echo "==> アプリ本体:  http://localhost:${WEB_PORT}"
+echo "==> Rails API:   http://localhost:${API_PORT}/api/v1"
+echo "==> メール確認:  http://localhost:${API_PORT}/letter_opener"
+
+exec docker compose up "$@"

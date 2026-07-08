@@ -1,0 +1,49 @@
+# Git・エディタ関連
+/.git
+/.gitattributes
+/.gitignore
+/.vscode
+/.claude
+/.docs
+/.serena
+/.ruby-lsp
+.DS_Store
+
+# Docker 関連（イメージには含めない）
+/.dockerignore
+/Dockerfile*
+/compose*.yaml
+
+# 秘密情報（RAILS_MASTER_KEY は実行時に環境変数で渡す）
+/config/master.key
+/config/credentials/*.key
+.env*
+/frontend/.env*
+
+# ログ・一時ファイル
+/log/*
+!/log/.keep
+/tmp/*
+!/tmp/pids
+/tmp/pids/*
+!/tmp/pids/.keep
+
+# 開発時にアップロードされたファイル
+/storage/*
+!/storage/.keep
+
+# 依存パッケージ（イメージ内でインストールする）
+/.bundle
+/vendor/bundle
+/frontend/node_modules
+
+# Vite のビルド成果物（イメージビルド時に再生成する）
+/public/index.html
+/public/assets
+
+# テスト・ドキュメント
+/spec
+/test
+/docs
+/img
+/README.md
