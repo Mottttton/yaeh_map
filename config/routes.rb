@@ -1,13 +1,35 @@
 Rails.application.routes.draw do
-  root 'top#index'
-  resources :top, only: %i(index)
-  resources :posts do
-    resources :favorites, only: %i(create destroy)
+  # Devise のマッピング（warden の scope :account）だけ登録し、ルートは /api/v1 配下に自前で定義する
+  devise_for :accounts, skip: :all
+
+  namespace :api do
+    namespace :v1 do
+      # 認証
+      resource :session, only: %i(show create destroy), controller: "sessions"
+      resource :registration, only: %i(create update destroy), controller: "registrations"
+      resource :password, only: %i(create update), controller: "passwords"
+
+      # enum 定義などフロントエンドと共有するメタ情報
+      get "meta", to: "meta#show"
+
+      resources :posts, only: %i(index show create update destroy) do
+        resource :favorite, only: %i(create destroy), controller: "favorites"
+      end
+      resources :accounts, only: %i(show update)
+
+      namespace :admin do
+        resources :accounts, only: %i(index destroy)
+      end
+    end
   end
-  devise_for :accounts
-  resources :accounts, only: %i(show edit update)
-  mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
+
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
+
+  # ビルド済み SPA（public/index.html）の配信。API・Active Storage・拡張子付きパスは除外する
+  root "static#index"
+  get "*path", to: "static#index", constraints: ->(req) {
+    !req.path.start_with?("/api/", "/rails/", "/letter_opener") && !req.path.include?(".")
+  }
 end

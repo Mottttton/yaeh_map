@@ -1,78 +1,42 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.0.1'
+ruby file: '.ruby-version'
 
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
-gem 'rails', '~> 7.0.8', '>= 7.0.8.4'
+# バックエンド本体（API モード）
+gem 'rails', '~> 8.0.2'
 # Use postgresql as the database for Active Record
-gem 'pg', '~> 1.1'
+gem 'pg', '~> 1.5'
 # Use Puma as the app server
-gem 'puma', '~> 5.0'
-# Use SCSS for stylesheets
-gem "dartsass-rails", "~> 0.5.1"
-# Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
-gem 'webpacker', '~> 5.0'
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-gem 'turbolinks', '~> 5'
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.7'
-# Use Redis adapter to run Action Cable in production
-# gem 'redis', '~> 4.0'
-# Use Active Model has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
+gem 'puma', '>= 6.4'
+
+# 認証
+gem 'devise'
+gem 'devise-i18n'
+
+# 検索・ページネーション
+gem 'ransack'
+gem 'kaminari'
 
 # Use Active Storage variant
 gem 'image_processing', '~> 1.2'
 gem 'active_storage_validations'
+gem 'aws-sdk-s3', require: false
+
+# 別オリジンから API を利用する場合の CORS 設定（通常は Vite の proxy 経由なので未使用）
+gem 'rack-cors'
+
+gem 'dotenv-rails'
 
 # Reduces boot times through caching; required in config/boot.rb
-gem 'bootsnap', '>= 1.4.4', require: false
-
-gem 'devise'
-gem 'devise-i18n'
-gem 'rexml'
-gem 'rails_admin', '~> 3.0'
-gem 'cancancan'
-gem 'dotenv-rails'
-gem 'ransack'
-gem 'kaminari'
-gem 'bootstrap', '~> 5.3.2'
-gem 'jquery-rails'
-gem 'bootstrap5-kaminari-views', '~> 0.0.1'
-gem 'unicorn'
-gem 'aws-sdk-s3', require: false
-gem 'sprockets-rails'
+gem 'bootsnap', require: false
 
 group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
-  gem 'rspec-rails', '~> 4.0.0'
+  gem 'debug', platforms: %i[mri], require: 'debug/prelude'
+  gem 'rspec-rails'
   gem 'factory_bot_rails'
 end
 
 group :development do
-  gem "capistrano", "3.18.1", require: false
-  gem "capistrano-rails", "~> 1.6", require: false
-  gem 'capistrano-safe-deploy-to'
-  gem 'capistrano-rbenv', '~> 2.2'
-  gem 'capistrano3-unicorn'
-  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
-  gem 'web-console', '>= 4.1.0'
-  # Display performance information such as SQL time and flame graphs for each request in your browser.
-  # Can be configured to work on production as well see: https://github.com/MiniProfiler/rack-mini-profiler/blob/master/README.md
-  gem 'rack-mini-profiler', '~> 2.0'
-  gem 'listen', '~> 3.3'
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
   gem 'letter_opener_web'
 end
-
-group :test do
-  # Adds support for Capybara system testing and selenium driver
-  gem 'capybara', '>= 3.26'
-  gem 'selenium-webdriver', '>= 4.0.0.rc1'
-end
-
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

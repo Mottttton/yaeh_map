@@ -4,13 +4,13 @@ class Account < ApplicationRecord
   has_many :favorites, dependent: :destroy
   has_one_attached :portrait
   validates :name, presence: true, uniqueness: true, length: { maximum: 50 }, format: { with: /\A[\w]+[\w]\z/ }
-  validates :email, presence: true, uniqueness: true, length: { maximum: 255 }, format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i  }
+  validates :email, presence: true, uniqueness: true, length: { maximum: 255 }, format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i }
   validates :nickname, presence: true, length: { maximum: 50 }
   validates :self_introduction, length: { maximum: 500 }
   validates :portrait, content_type: %i(png jpg jpeg)
-  enum region: Region.regions, _prefix: true
+  enum :region, Region::REGIONS, prefix: true
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-  :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable
 end
