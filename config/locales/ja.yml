@@ -121,6 +121,11 @@ ja:
     require_sign_out: ログアウトしてください
     require_admin: 管理者以外アクセスできません
     reject: アクセス権限がありません
+  passwords:
+    create:
+      sent: パスワード再設定用のメールを送信しました
+    update:
+      updated: パスワードを変更しました
   posts:
     nav:
       index: 情報一覧

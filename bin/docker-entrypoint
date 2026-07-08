@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+# jemalloc を有効化してメモリ使用量を削減する
+if [ -z "${LD_PRELOAD+x}" ]; then
+  LD_PRELOAD=$(find /usr/lib -name libjemalloc.so.2 -print -quit)
+  export LD_PRELOAD
+fi
+
+# rails server として起動された場合は DB の作成・マイグレーションを行う。
+# ECS 等で複数タスクを同時起動する場合など、マイグレーションを別で実行したいときは
+# AUTO_DB_PREPARE=false を設定する。
+if [ "${AUTO_DB_PREPARE:-true}" != "false" ] && [ "${*: -2:1}" == "./bin/rails" ] && [ "${*: -1:1}" == "server" ]; then
+  ./bin/rails db:prepare
+fi
+
+exec "$@"

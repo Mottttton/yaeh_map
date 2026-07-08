@@ -1,0 +1,22 @@
+# syntax=docker/dockerfile:1
+# ローカル開発用（Rails API コンテナ）。compose.yaml から利用する。
+# ソースコードはボリュームマウントするため、ここでは gem のインストールまで行う。
+
+ARG RUBY_VERSION=3.4.4
+FROM ruby:$RUBY_VERSION-slim
+
+WORKDIR /app
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential git curl pkg-config \
+      libpq-dev libyaml-dev libvips postgresql-client && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# gem は named volume(/usr/local/bundle) にキャッシュされる。
+# ここでのインストール結果が初回起動時にボリュームへコピーされる。
+COPY Gemfile Gemfile.lock .ruby-version ./
+RUN bundle install
+
+EXPOSE 3000
+CMD ["bin/rails", "server", "-b", "0.0.0.0"]
