@@ -1,6 +1,3 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
-
 @import "tailwindcss";
 
 @import "tw-animate-css";
@@ -9,173 +6,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* 旧 app/assets/stylesheets/application.scss の移植 */
-
-a {
-  text-decoration: none;
-}
-
-/* header */
-@media (max-width: 991.98px) {
-  .navbar-expand-lg .navbar-collapse {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 100%;
-  }
-  .navbar-expand-lg .navbar-collapse .navbar-nav {
-    position: relative;
-  }
-  .navbar-expand-lg .navbar-collapse .navbar-nav > .nav-item {
-    position: relative;
-  }
-}
-
-.dropdown-menu {
-  min-width: 20rem !important;
-}
-
-/* map */
-#map {
-  height: 400px;
-}
-
-.map {
-  position: relative;
-  width: 100%;
-  height: 65vh;
-}
-.map iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* Google Maps API キー未設定時のプレースホルダ */
-.map-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  min-height: 200px;
-  background: #e9ecef;
-  color: #6c757d;
-}
-
-/* post */
-#notification {
-  margin-top: 56px;
-}
-
-#timeline .col .post .carousel .carousel-inner {
-  height: 261px;
-}
-@media (min-width: 576px) {
-  #timeline .col .post .carousel .carousel-inner {
-    height: 380px;
-  }
-}
-@media (min-width: 768px) {
-  #timeline .col .post .carousel .carousel-inner {
-    height: 250px;
-  }
-}
-@media (min-width: 992px) {
-  #timeline .col .post .carousel .carousel-inner {
-    height: 340px;
-  }
-}
-@media (min-width: 1200px) {
-  #timeline .col .post .carousel .carousel-inner {
-    height: 408px;
-  }
-}
-@media (min-width: 1400px) {
-  #timeline .col .post .carousel .carousel-inner {
-    height: 475px;
-  }
-}
-#timeline .col .post .carousel .carousel-inner .carousel-item {
-  height: 100%;
-}
-#timeline .col .post .carousel .carousel-inner .carousel-item > img {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-}
-
-.account-name {
-  height: 20px;
-}
-
-.profile-portrait {
-  height: 120px;
-  width: 120px;
-  object-fit: cover;
-}
-
-.timeline-portrait {
-  height: 40px;
-  width: 40px;
-  object-fit: cover;
-}
-
-.card-header {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.post-description {
-  word-wrap: break-word;
-  height: 100px;
-  overflow-y: hidden;
-}
-.post-description p {
-  white-space: pre-wrap;
-  text-align: justify;
-  text-overflow: ellipsis;
-}
-
-.wrap-rgba-white {
-  background: rgba(255, 255, 255, 0.6);
-}
-
-/* favorite */
-.favorited {
-  color: #ffc107;
-}
-
-.unfavorited {
-  color: #000;
-}
-
-.favorite-link {
-  cursor: pointer;
-}
-
-/* ログイン画面 */
-.form-signin {
-  max-width: 330px;
-  padding: 1rem;
-}
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
 @theme inline {
-  --font-sans: 'Geist Variable', sans-serif;
-  --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -289,5 +120,13 @@ a {
   body {
     @apply bg-background text-foreground;
     @apply font-sans;
+  }
+}
+
+/* ネイティブ <select> を shadcn の Input と揃えるスタイル。
+   空の選択肢（未選択）を扱うため Reka UI の Select ではなくネイティブを使う箇所用 */
+@layer components {
+  .native-select {
+    @apply dark:bg-input/30 border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full min-w-0 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:ring-3 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
   }
 }

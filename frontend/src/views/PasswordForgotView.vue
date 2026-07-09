@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useFlashStore } from '../stores/flash'
 import { authApi } from '../api'
 
@@ -22,23 +26,23 @@ async function sendResetMail() {
 </script>
 
 <template>
-  <div class="container mt-5">
-    <div class="form-signin mx-auto">
-      <h2>パスワード再設定</h2>
-      <p>登録したメールアドレスを入力してください。パスワード再設定用のリンクを送信します。</p>
-      <div v-if="sent" class="alert alert-success">
+  <div class="mx-auto mt-10 w-full max-w-sm px-4">
+    <h2 class="mb-4 text-2xl font-semibold">パスワード再設定</h2>
+    <p class="mb-4 text-sm">登録したメールアドレスを入力してください。パスワード再設定用のリンクを送信します。</p>
+    <Alert v-if="sent" class="mb-4">
+      <AlertDescription>
         メールを送信しました。メール内のリンクからパスワードを再設定してください。
+      </AlertDescription>
+    </Alert>
+    <form class="space-y-4" @submit.prevent="sendResetMail">
+      <div class="space-y-2">
+        <Label for="forgot-email">メールアドレス</Label>
+        <Input id="forgot-email" v-model="email" type="email" autocomplete="email" autofocus />
       </div>
-      <form @submit.prevent="sendResetMail">
-        <div class="form-floating mb-3">
-          <input id="forgot-email" v-model="email" type="email" class="form-control" placeholder="メールアドレス" autocomplete="email" autofocus />
-          <label for="forgot-email">メールアドレス</label>
-        </div>
-        <button type="submit" class="btn btn-primary w-100" :disabled="submitting">送信する</button>
-      </form>
-      <div class="mt-4">
-        <router-link :to="{ name: 'login' }">ログインに戻る</router-link>
-      </div>
+      <Button type="submit" class="w-full" :disabled="submitting">送信する</Button>
+    </form>
+    <div class="mt-6 text-sm">
+      <router-link class="text-primary hover:underline" :to="{ name: 'login' }">ログインに戻る</router-link>
     </div>
   </div>
 </template>

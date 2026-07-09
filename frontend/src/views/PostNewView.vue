@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useFlashStore } from '../stores/flash'
 import { postsApi } from '../api'
 import { extractErrors } from '../api/errors'
@@ -29,14 +30,16 @@ async function createPost(formData: FormData) {
 </script>
 
 <template>
-  <div class="container mt-5">
-    <h1>情報登録</h1>
-    <div v-if="errors.length" class="alert alert-danger">
-      <h2 class="alert-heading">情報の登録に失敗しました</h2>
-      <ul>
-        <li v-for="error in errors" :key="error">{{ error }}</li>
-      </ul>
-    </div>
+  <div class="mx-auto mt-10 w-full max-w-2xl px-4">
+    <h1 class="mb-4 text-3xl font-bold">情報登録</h1>
+    <Alert v-if="errors.length" variant="destructive" role="alert" class="mb-4">
+      <AlertTitle>情報の登録に失敗しました</AlertTitle>
+      <AlertDescription>
+        <ul class="list-disc pl-4">
+          <li v-for="error in errors" :key="error">{{ error }}</li>
+        </ul>
+      </AlertDescription>
+    </Alert>
     <PostForm mode="new" :submitting="submitting" @submit="createPost" />
   </div>
 </template>

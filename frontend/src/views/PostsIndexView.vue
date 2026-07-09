@@ -52,8 +52,8 @@ function changePage(page: number) {
 </script>
 
 <template>
-  <div class="container">
-    <h2>投稿一覧</h2>
+  <div class="mx-auto w-full max-w-5xl px-4 pt-6">
+    <h2 class="mb-4 text-2xl font-semibold">投稿一覧</h2>
     <p v-if="!loading && posts.length === 0">投稿がありません</p>
     <PostTimeline :posts="posts" :meta="meta" @page-change="changePage" @deleted="fetchPosts" />
   </div>

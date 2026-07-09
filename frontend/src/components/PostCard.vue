@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { MapPinIcon } from '@lucide/vue'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { postsApi } from '../api'
@@ -18,7 +23,6 @@ const flash = useFlashStore()
 const isOwner = computed(() => auth.account?.id === props.post.account.id)
 const canModerate = computed(() => isOwner.value || auth.isAdmin)
 const mapImage = computed(() => staticMapUrl(props.post.latitude, props.post.longitude))
-const totalSlides = computed(() => props.post.photos.length + 1)
 
 // いいねの状態は一覧・詳細で共有する post オブジェクトへ反映する
 function onFavoriteUpdated(state: FavoriteState) {
@@ -35,85 +39,75 @@ async function destroyPost() {
 </script>
 
 <template>
-  <div class="post card shadow-sm">
-    <h3 class="card-header fs-5">{{ post.title }}</h3>
-    <div :id="`carousel-post-${post.id}`" class="post_map carousel slide card-img-top">
-      <div v-if="post.photos.length" class="carousel-indicators rounded-pill bg-dark bg-opacity-25">
-        <button
-          v-for="index in totalSlides"
-          :key="index"
-          type="button"
-          :data-bs-target="`#carousel-post-${post.id}`"
-          :data-bs-slide-to="index - 1"
-          :class="{ active: index === 1 }"
-          :aria-current="index === 1 ? 'true' : undefined"
-          :aria-label="`Slide ${index}`"
-        ></button>
-      </div>
-      <div class="carousel-inner">
-        <div
-          v-for="(photo, index) in post.photos"
-          :key="photo.url"
-          class="carousel-item"
-          :class="{ active: index === 0 }"
-        >
-          <img class="d-block w-100" :src="photo.thumb_url" alt="投稿写真" />
-        </div>
-        <div class="carousel-item" :class="{ active: post.photos.length === 0 }">
-          <img v-if="mapImage" class="d-block w-100" :src="mapImage" alt="地図" />
-          <div v-else class="map-placeholder">
-            <i class="bi bi-pin-map-fill fs-1"></i>
+  <Card class="post gap-0 overflow-hidden py-0 shadow-sm">
+    <h3 class="truncate border-b px-4 py-3 text-lg font-semibold">{{ post.title }}</h3>
+
+    <!-- 写真スライド + 最後に地図（写真がない場合は地図のみ） -->
+    <Carousel class="post_map w-full">
+      <CarouselContent class="ml-0">
+        <CarouselItem v-for="photo in post.photos" :key="photo.url" class="pl-0">
+          <img class="aspect-4/3 w-full object-cover" :src="photo.thumb_url" alt="投稿写真" />
+        </CarouselItem>
+        <CarouselItem class="pl-0">
+          <img v-if="mapImage" class="aspect-4/3 w-full object-cover" :src="mapImage" alt="地図" />
+          <div v-else class="bg-muted text-muted-foreground flex aspect-4/3 flex-col items-center justify-center">
+            <MapPinIcon class="size-10" />
             <span>{{ post.prefecture || post.region }}</span>
           </div>
-        </div>
-      </div>
+        </CarouselItem>
+      </CarouselContent>
       <template v-if="post.photos.length">
-        <button class="carousel-control-prev" type="button" :data-bs-target="`#carousel-post-${post.id}`" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon bg-dark rounded-start-pill" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" :data-bs-target="`#carousel-post-${post.id}`" data-bs-slide="next">
-          <span class="carousel-control-next-icon bg-dark rounded-end-pill" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
+        <CarouselPrevious class="left-2" />
+        <CarouselNext class="right-2" />
       </template>
-    </div>
-    <div class="post_content card-body px-4">
-      <div class="d-flex align-items-end justify-content-between mb-2">
-        <div>
+    </Carousel>
+
+    <CardContent class="post_content px-4 py-4">
+      <div class="mb-2 flex items-end justify-between">
+        <div class="flex items-center gap-1">
+          <PortraitIcon :url="post.account.portrait_thumb_url" />
+          <span class="text-lg">{{ post.account.nickname }}</span>
           <span>
-            <PortraitIcon :url="post.account.portrait_thumb_url" />
+            (<router-link
+              :to="{ name: 'account-show', params: { id: post.account.id } }"
+              :class="`account-${post.account.id}`"
+              class="text-primary hover:underline"
+            >@{{ post.account.name }}</router-link>)
           </span>
-          <span class="fs-5">{{ post.account.nickname }}</span>
-          (<router-link :to="{ name: 'account-show', params: { id: post.account.id } }" :class="`account-${post.account.id}`">@{{ post.account.name }}</router-link>)
         </div>
-        <small class="text-body-secondary">{{ timeAgoInWords(post.created_at) }}</small>
+        <small class="text-muted-foreground shrink-0">{{ timeAgoInWords(post.created_at) }}</small>
       </div>
-      <div class="mb-3">
-        <span class="badge bg-primary">{{ post.genre }}</span>
-        <span class="badge bg-primary">{{ post.region }}</span>
-        <span v-if="post.prefecture" class="badge bg-primary">{{ post.prefecture }}</span>
+
+      <div class="mb-3 flex flex-wrap gap-1">
+        <Badge>{{ post.genre }}</Badge>
+        <Badge>{{ post.region }}</Badge>
+        <Badge v-if="post.prefecture">{{ post.prefecture }}</Badge>
       </div>
-      <div class="post-group position-relative">
-        <div class="mb-5 post-description">
-          <p>{{ post.description }}</p>
+
+      <!-- 本文は高さを制限し、下端をぼかして「もっと見る」を重ねる -->
+      <div class="relative mb-8">
+        <div class="max-h-24 overflow-hidden">
+          <p class="text-justify wrap-break-word whitespace-pre-wrap">{{ post.description }}</p>
         </div>
-        <div class="position-absolute top-100 start-50 translate-middle h-75 w-100 wrap-rgba-white"></div>
-        <div class="d-grid col-6 position-absolute top-100 start-50 translate-middle">
-          <router-link :to="{ name: 'post-show', params: { id: post.id } }" class="show-post btn btn-primary" role="button">もっと見る</router-link>
+        <div class="from-card absolute inset-x-0 bottom-0 h-12 bg-linear-to-t to-transparent"></div>
+        <div class="absolute inset-x-0 -bottom-4 flex justify-center">
+          <Button as-child class="show-post w-1/2">
+            <router-link :to="{ name: 'post-show', params: { id: post.id } }">もっと見る</router-link>
+          </Button>
         </div>
       </div>
-      <div class="d-flex justify-content-between align-items-center">
+
+      <div class="flex items-center justify-between">
         <div :id="`favorite-${post.id}`">
           <FavoriteButton :post="post" @updated="onFavoriteUpdated" />
         </div>
-        <div class="btn-group">
-          <template v-if="canModerate">
-            <button type="button" class="destroy-post btn btn-sm btn-outline-danger" @click="destroyPost">削除</button>
-            <router-link v-if="isOwner" :to="{ name: 'post-edit', params: { id: post.id } }" class="edit-post btn btn-sm btn-outline-secondary">編集</router-link>
-          </template>
+        <div v-if="canModerate" class="flex gap-2">
+          <Button type="button" variant="destructive" size="sm" class="destroy-post" @click="destroyPost">削除</Button>
+          <Button v-if="isOwner" as-child variant="outline" size="sm" class="edit-post">
+            <router-link :to="{ name: 'post-edit', params: { id: post.id } }">編集</router-link>
+          </Button>
         </div>
       </div>
-    </div>
-  </div>
+    </CardContent>
+  </Card>
 </template>

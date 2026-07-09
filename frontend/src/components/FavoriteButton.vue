@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ThumbsUpIcon } from '@lucide/vue'
 import { favoritesApi } from '../api'
 import type { FavoriteState, Post } from '../types'
 
@@ -17,13 +18,18 @@ async function toggle() {
 </script>
 
 <template>
-  <a class="favorite-link" :id="`fav_link-${post.id}`" href="#" @click.prevent="toggle">
+  <button
+    type="button"
+    :id="`fav_link-${post.id}`"
+    class="inline-flex cursor-pointer items-center gap-1 align-middle"
+    @click="toggle"
+  >
     <template v-if="post.favorited">
-      <span class="text-black">v(･∀･)yaeh!</span>
-      <i class="bi bi-hand-thumbs-up-fill favorited"></i>
+      <span>v(･∀･)yaeh!</span>
+      <ThumbsUpIcon class="size-5 fill-amber-400 text-amber-400" />
     </template>
-    <i v-else class="bi bi-hand-thumbs-up unfavorited"></i>
-  </a>
+    <ThumbsUpIcon v-else class="size-5" />
+  </button>
   <span :id="`num_of_fav-${post.id}`">
     {{ post.favorites_count }}
   </span>

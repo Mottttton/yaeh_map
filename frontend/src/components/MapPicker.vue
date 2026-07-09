@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { MapPinIcon } from '@lucide/vue'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { loadGoogleMaps, googleMapsApiKey } from '../utils/googleMaps'
 import { useMetaStore } from '../stores/meta'
 import type { MapLocation } from '../types'
@@ -136,31 +140,29 @@ function searchLocation() {
 </script>
 
 <template>
-  <div class="mb-3">
-    <div class="mb-1">
-      <i class="bi bi-pin-map"></i>地図にピンをさしてください
+  <div class="space-y-2">
+    <div class="flex items-center gap-1 text-sm">
+      <MapPinIcon class="size-4" />地図にピンをさしてください
     </div>
     <template v-if="mapAvailable">
-      <div class="input-group mb-2">
-        <button type="button" id="current_location" class="btn btn-outline-secondary" @click="moveToCurrentLocation">現在地</button>
-        <div class="form-floating">
-          <input
-            id="placeSearch"
-            v-model="searchWord"
-            class="form-control"
-            type="text"
-            placeholder="場所を検索"
-            @keydown.enter.prevent="searchLocation"
-          />
-          <label for="placeSearch">場所を検索</label>
-        </div>
-        <button type="button" id="search-location-btn" class="btn btn-outline-secondary" @click="searchLocation">検索</button>
+      <div class="flex gap-2">
+        <Button type="button" id="current_location" variant="outline" @click="moveToCurrentLocation">現在地</Button>
+        <Input
+          id="placeSearch"
+          v-model="searchWord"
+          type="text"
+          placeholder="場所を検索"
+          @keydown.enter.prevent="searchLocation"
+        />
+        <Button type="button" id="search-location-btn" variant="outline" @click="searchLocation">検索</Button>
       </div>
-      <div id="map" ref="mapElement" class="mb-3"></div>
+      <div id="map" ref="mapElement" class="h-100 w-full rounded-md"></div>
     </template>
-    <div v-else class="alert alert-info">
-      Google Maps API キー（VITE_GOOGLE_MAPS_API_KEY）が設定されていないため地図を表示できません。
-      位置情報を設定できないため、投稿の作成には API キーの設定が必要です。
-    </div>
+    <Alert v-else>
+      <AlertDescription>
+        Google Maps API キー（VITE_GOOGLE_MAPS_API_KEY）が設定されていないため地図を表示できません。
+        位置情報を設定できないため、投稿の作成には API キーの設定が必要です。
+      </AlertDescription>
+    </Alert>
   </div>
 </template>

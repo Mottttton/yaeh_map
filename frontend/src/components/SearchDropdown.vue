@@ -1,11 +1,19 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
+import { SearchIcon } from '@lucide/vue'
 import { useRoute, useRouter, type LocationQueryRaw, type LocationQueryValue } from 'vue-router'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useMetaStore } from '../stores/meta'
 
 const route = useRoute()
 const router = useRouter()
 const meta = useMetaStore()
+
+const open = ref(false)
 
 interface SearchForm {
   keyword: string
@@ -35,64 +43,74 @@ function toArray(value: LocationQueryValue | LocationQueryValue[] | undefined): 
   return Array.isArray(value) ? value : [value]
 }
 
+// チェックボックス群（複数選択）の値をトグルする
+function toggleValue(list: number[], value: number, checked: boolean) {
+  const index = list.indexOf(value)
+  if (checked && index === -1) list.push(value)
+  if (!checked && index !== -1) list.splice(index, 1)
+}
+
 function submit() {
   const query: LocationQueryRaw = {}
   if (form.keyword) query.keyword = form.keyword
   if (form.region !== '' && form.region != null) query.region = form.region
   if (form.prefectures.length) query.prefs = form.prefectures
   if (form.genres.length) query.genres = form.genres
+  open.value = false
   router.push({ name: 'posts', query })
 }
 </script>
 
 <template>
-  <div class="nav-item dropdown nav-search px-3">
-    <a class="nav-link" role="button" href="#" id="navSearch" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-      <i class="bi bi-search fs-4"> </i>
-    </a>
-    <div class="dropdown-menu dropdown-menu-end navbar-nav-scroll shadow rounded p-2" aria-labelledby="navSearch">
-      <form @submit.prevent="submit">
-        <div class="mb-3">
-          <label for="search-keyword" class="form-label">キーワード</label>
-          <input id="search-keyword" v-model="form.keyword" type="search" class="form-control" />
+  <Popover v-model:open="open">
+    <PopoverTrigger as-child>
+      <Button id="navSearch" variant="ghost" size="icon" aria-label="検索">
+        <SearchIcon class="size-5" />
+      </Button>
+    </PopoverTrigger>
+    <PopoverContent align="end" class="max-h-[80vh] w-80 overflow-y-auto">
+      <form class="space-y-4" @submit.prevent="submit">
+        <div class="space-y-2">
+          <Label for="search-keyword">キーワード</Label>
+          <Input id="search-keyword" v-model="form.keyword" type="search" />
         </div>
-        <div class="mb-3">
-          <label for="search-region">地域</label>
-          <select id="search-region" v-model="form.region" class="form-select">
+        <div class="space-y-2">
+          <Label for="search-region">地域</Label>
+          <select id="search-region" v-model="form.region" class="native-select">
             <option value=""></option>
             <option v-for="region in meta.regions" :key="region.value" :value="region.value">{{ region.label }}</option>
           </select>
         </div>
-        <div class="mb-3">
-          <div>都道府県</div>
-          <div v-for="prefecture in meta.prefectures" :key="prefecture.value" class="form-check form-check-inline">
-            <input
-              :id="`search-pref-${prefecture.value}`"
-              v-model="form.prefectures"
-              type="checkbox"
-              class="form-check-input"
-              :value="prefecture.value"
-            />
-            <label :for="`search-pref-${prefecture.value}`" class="form-check-label">{{ prefecture.label }}</label>
+        <div class="space-y-2">
+          <div class="text-sm font-medium">都道府県</div>
+          <div class="flex flex-wrap gap-x-4 gap-y-2">
+            <div v-for="prefecture in meta.prefectures" :key="prefecture.value" class="flex items-center gap-2">
+              <Checkbox
+                :id="`search-pref-${prefecture.value}`"
+                :model-value="form.prefectures.includes(prefecture.value)"
+                @update:model-value="(v) => toggleValue(form.prefectures, prefecture.value, v === true)"
+              />
+              <Label :for="`search-pref-${prefecture.value}`" class="font-normal">{{ prefecture.label }}</Label>
+            </div>
           </div>
         </div>
-        <div class="mb-3">
-          <div>分類</div>
-          <div v-for="genre in meta.genres" :key="genre.value" class="form-check form-check-inline">
-            <input
-              :id="`search-genre-${genre.value}`"
-              v-model="form.genres"
-              type="checkbox"
-              class="form-check-input"
-              :value="genre.value"
-            />
-            <label :for="`search-genre-${genre.value}`" class="form-check-label">{{ genre.label }}</label>
+        <div class="space-y-2">
+          <div class="text-sm font-medium">分類</div>
+          <div class="flex flex-wrap gap-x-4 gap-y-2">
+            <div v-for="genre in meta.genres" :key="genre.value" class="flex items-center gap-2">
+              <Checkbox
+                :id="`search-genre-${genre.value}`"
+                :model-value="form.genres.includes(genre.value)"
+                @update:model-value="(v) => toggleValue(form.genres, genre.value, v === true)"
+              />
+              <Label :for="`search-genre-${genre.value}`" class="font-normal">{{ genre.label }}</Label>
+            </div>
           </div>
         </div>
-        <div class="d-flex justify-content-start">
-          <button type="submit" class="btn btn-secondary">検索</button>
+        <div class="flex justify-start">
+          <Button type="submit" variant="secondary">検索</Button>
         </div>
       </form>
-    </div>
-  </div>
+    </PopoverContent>
+  </Popover>
 </template>

@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { useMetaStore } from '../stores/meta'
@@ -60,59 +65,59 @@ async function signup() {
 </script>
 
 <template>
-  <div class="container mt-5">
-    <h2>アカウント登録</h2>
-    <div v-if="errors.length" class="alert alert-danger" role="alert">
-      <ul class="mb-0">
-        <li v-for="error in errors" :key="error">{{ error }}</li>
-      </ul>
-    </div>
-    <form @submit.prevent="signup">
-      <div class="form-floating mb-3">
-        <input id="account-name" v-model="form.name" type="text" class="form-control" placeholder="アカウント名" autocomplete="username" autofocus />
-        <label for="account-name">アカウント名</label>
-        <span>半角英数字と_で入力してください</span>
+  <div class="mx-auto mt-10 w-full max-w-xl px-4">
+    <h2 class="mb-4 text-2xl font-semibold">アカウント登録</h2>
+    <Alert v-if="errors.length" variant="destructive" role="alert" class="mb-4">
+      <AlertDescription>
+        <ul class="list-disc pl-4">
+          <li v-for="error in errors" :key="error">{{ error }}</li>
+        </ul>
+      </AlertDescription>
+    </Alert>
+    <form class="space-y-4" @submit.prevent="signup">
+      <div class="space-y-2">
+        <Label for="account-name">アカウント名</Label>
+        <Input id="account-name" v-model="form.name" type="text" autocomplete="username" autofocus />
+        <p class="text-muted-foreground text-sm">半角英数字と_で入力してください</p>
       </div>
-      <div class="form-floating mb-3">
-        <input id="account-email" v-model="form.email" type="email" class="form-control" placeholder="メールアドレス" autocomplete="email" />
-        <label for="account-email">メールアドレス</label>
+      <div class="space-y-2">
+        <Label for="account-email">メールアドレス</Label>
+        <Input id="account-email" v-model="form.email" type="email" autocomplete="email" />
       </div>
-      <div class="form-floating mb-3">
-        <input id="account-nickname" v-model="form.nickname" type="text" class="form-control" placeholder="ニックネーム" autocomplete="nickname" />
-        <label for="account-nickname">ニックネーム</label>
+      <div class="space-y-2">
+        <Label for="account-nickname">ニックネーム</Label>
+        <Input id="account-nickname" v-model="form.nickname" type="text" autocomplete="nickname" />
       </div>
-      <div class="form-group mb-3">
-        <label for="account-portrait">アイコン</label>
-        <div class="input-group form-file">
-          <input id="account-portrait" type="file" class="form-control" accept="image/png,image/jpeg" @change="onPortraitChange" />
-        </div>
+      <div class="space-y-2">
+        <Label for="account-portrait">アイコン</Label>
+        <Input id="account-portrait" type="file" accept="image/png,image/jpeg" @change="onPortraitChange" />
       </div>
-      <div class="form-floating mb-3">
-        <select id="account-region" v-model="form.region" class="form-select">
+      <div class="space-y-2">
+        <Label for="account-region">地域</Label>
+        <select id="account-region" v-model="form.region" class="native-select">
           <option value=""></option>
           <option v-for="region in meta.regions" :key="region.value" :value="region.label">{{ region.label }}</option>
         </select>
-        <label for="account-region">地域</label>
       </div>
-      <div class="form-floating mb-3">
-        <textarea id="account-self-introduction" v-model="form.self_introduction" class="form-control" placeholder="自己紹介" style="height: 100px;"></textarea>
-        <label for="account-self-introduction">自己紹介</label>
+      <div class="space-y-2">
+        <Label for="account-self-introduction">自己紹介</Label>
+        <Textarea id="account-self-introduction" v-model="form.self_introduction" class="h-25" />
       </div>
-      <div class="form-floating mb-3">
-        <input id="account-password" v-model="form.password" type="password" class="form-control" placeholder="パスワード" autocomplete="new-password" />
-        <label for="account-password">パスワード</label>
+      <div class="space-y-2">
+        <Label for="account-password">パスワード</Label>
+        <Input id="account-password" v-model="form.password" type="password" autocomplete="new-password" />
+        <p class="text-muted-foreground text-sm italic">パスワードは6文字以上で入力してください</p>
       </div>
-      <em>パスワードは6文字以上で入力してください</em>
-      <div class="form-floating mb-3">
-        <input id="account-password-confirmation" v-model="form.password_confirmation" type="password" class="form-control" placeholder="パスワード（確認）" autocomplete="new-password" />
-        <label for="account-password-confirmation">パスワード（確認）</label>
+      <div class="space-y-2">
+        <Label for="account-password-confirmation">パスワード（確認）</Label>
+        <Input id="account-password-confirmation" v-model="form.password_confirmation" type="password" autocomplete="new-password" />
       </div>
       <div class="actions">
-        <button id="create-account" type="submit" class="btn btn-primary" :disabled="submitting">アカウント登録</button>
+        <Button id="create-account" type="submit" :disabled="submitting">アカウント登録</Button>
       </div>
     </form>
-    <div class="mt-4">
-      <router-link :to="{ name: 'login' }">ログインはこちら</router-link>
+    <div class="mt-6 text-sm">
+      <router-link class="text-primary hover:underline" :to="{ name: 'login' }">ログインはこちら</router-link>
     </div>
   </div>
 </template>

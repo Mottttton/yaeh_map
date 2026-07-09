@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { MapPinIcon } from '@lucide/vue'
 import { useRouter } from 'vue-router'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { postsApi } from '../api'
@@ -44,61 +47,68 @@ async function destroyPost() {
 </script>
 
 <template>
-  <div v-if="post" class="container mt-5">
-    <div>
-      <h1>情報詳細</h1>
-      <div>
-        <h2>{{ post.title }}</h2>
+  <div v-if="post" class="mx-auto mt-10 w-full max-w-4xl px-4">
+    <h1 class="text-3xl font-bold">情報詳細</h1>
+    <h2 class="mt-2 mb-4 text-2xl font-semibold">{{ post.title }}</h2>
+
+    <div class="mb-2 flex items-center justify-between">
+      <div class="flex flex-wrap gap-1">
+        <Badge>{{ post.genre }}</Badge>
+        <Badge>{{ post.region }}</Badge>
+        <Badge v-if="post.prefecture">{{ post.prefecture }}</Badge>
       </div>
-      <div class="d-flex justify-content-between mb-2">
-        <div>
-          <span class="badge bg-primary">{{ post.genre }}</span>
-          <span class="badge bg-primary">{{ post.region }}</span>
-          <span v-if="post.prefecture" class="badge bg-primary">{{ post.prefecture }}</span>
-        </div>
-        <div>
-          <small class="text-body-secondary">{{ timeAgoInWords(post.created_at) }}</small>
-        </div>
+      <small class="text-muted-foreground">{{ timeAgoInWords(post.created_at) }}</small>
+    </div>
+
+    <div class="mb-4 flex items-end justify-between">
+      <div class="flex items-center gap-1">
+        <PortraitIcon :url="post.account.portrait_thumb_url" />
+        <span class="text-lg">{{ post.account.nickname }}</span>
+        <span>
+          (<router-link
+            :to="{ name: 'account-show', params: { id: post.account.id } }"
+            :class="`account-${post.account.id}`"
+            class="text-primary hover:underline"
+          >@{{ post.account.name }}</router-link>)
+        </span>
       </div>
-      <div class="d-flex justify-content-between align-items-end mb-3">
-        <div>
-          <span>
-            <PortraitIcon :url="post.account.portrait_thumb_url" />
-          </span>
-          <span class="fs-5">{{ post.account.nickname }}</span>
-          (<router-link :to="{ name: 'account-show', params: { id: post.account.id } }" :class="`account-${post.account.id}`">@{{ post.account.name }}</router-link>)
-        </div>
-        <div :id="`favorite-${post.id}`">
-          <FavoriteButton :post="post" @updated="onFavoriteUpdated" />
-        </div>
+      <div :id="`favorite-${post.id}`">
+        <FavoriteButton :post="post" @updated="onFavoriteUpdated" />
       </div>
-      <div v-if="post.photos.length" class="mb-3 row g-2">
-        <img v-for="photo in post.photos" :key="photo.url" :src="photo.thumb_url" class="col-sm-6" alt="投稿写真" />
-      </div>
-      <div class="mb-3 post-description" style="height: auto; overflow-y: visible;">
-        <p>{{ post.description }}</p>
-      </div>
-      <div v-if="embedUrl" class="map mb-1">
-        <iframe
-          frameborder="0"
-          style="border:0"
-          referrerpolicy="no-referrer-when-downgrade"
-          :src="embedUrl"
-          allowfullscreen
-        ></iframe>
-      </div>
-      <div v-else class="mb-3">
-        <a :href="externalMapUrl" target="_blank" rel="noopener">
-          <i class="bi bi-pin-map-fill"></i> Google マップで場所を確認する
-        </a>
-      </div>
-      <div class="d-flex justify-content-evenly">
-        <template v-if="canModerate">
-          <button id="destroy-post" type="button" class="btn btn-outline-danger" @click="destroyPost">削除</button>
-          <router-link v-if="isOwner" id="edit-post" :to="{ name: 'post-edit', params: { id: post.id } }" class="btn btn-outline-primary">編集</router-link>
-        </template>
-        <router-link id="back" :to="{ name: 'posts' }" class="btn btn-secondary">戻る</router-link>
-      </div>
+    </div>
+
+    <div v-if="post.photos.length" class="mb-4 grid gap-2 sm:grid-cols-2">
+      <img v-for="photo in post.photos" :key="photo.url" :src="photo.thumb_url" class="w-full rounded-md" alt="投稿写真" />
+    </div>
+
+    <div class="mb-4">
+      <p class="text-justify wrap-break-word whitespace-pre-wrap">{{ post.description }}</p>
+    </div>
+
+    <div v-if="embedUrl" class="relative mb-4 h-[65vh] w-full overflow-hidden rounded-md">
+      <iframe
+        class="absolute inset-0 h-full w-full border-0"
+        referrerpolicy="no-referrer-when-downgrade"
+        :src="embedUrl"
+        allowfullscreen
+      ></iframe>
+    </div>
+    <div v-else class="mb-4">
+      <a :href="externalMapUrl" target="_blank" rel="noopener" class="text-primary inline-flex items-center gap-1 hover:underline">
+        <MapPinIcon class="size-4" /> Google マップで場所を確認する
+      </a>
+    </div>
+
+    <div class="flex justify-evenly">
+      <template v-if="canModerate">
+        <Button id="destroy-post" type="button" variant="destructive" @click="destroyPost">削除</Button>
+        <Button v-if="isOwner" id="edit-post" as-child variant="outline">
+          <router-link :to="{ name: 'post-edit', params: { id: post.id } }">編集</router-link>
+        </Button>
+      </template>
+      <Button id="back" as-child variant="secondary">
+        <router-link :to="{ name: 'posts' }">戻る</router-link>
+      </Button>
     </div>
   </div>
 </template>

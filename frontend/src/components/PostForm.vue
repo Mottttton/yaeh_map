@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Textarea } from '@/components/ui/textarea'
 import { useMetaStore } from '../stores/meta'
 import MapPicker from './MapPicker.vue'
 import type { MapLocation, Post } from '../types'
@@ -93,27 +98,26 @@ function submit() {
 </script>
 
 <template>
-  <form @submit.prevent="submit">
-    <div class="form-floating mb-3">
-      <input id="post-title" v-model="form.title" type="text" class="form-control" placeholder="タイトル" />
-      <label for="post-title">タイトル</label>
+  <form class="space-y-4" @submit.prevent="submit">
+    <div class="space-y-2">
+      <Label for="post-title">タイトル</Label>
+      <Input id="post-title" v-model="form.title" type="text" placeholder="タイトル" />
     </div>
-    <div class="form-floating mb-3">
-      <textarea id="post-description" v-model="form.description" class="form-control" placeholder="詳細" style="height: 200px;"></textarea>
-      <label for="post-description">詳細</label>
+    <div class="space-y-2">
+      <Label for="post-description">詳細</Label>
+      <Textarea id="post-description" v-model="form.description" placeholder="詳細" class="h-50" />
     </div>
-    <div class="form-check form-check-inline mb-3 d-flex justify-content-around">
-      <div v-for="genre in meta.genres" :key="genre.value">
-        <input
-          :id="`post_genre_${genre.value}`"
-          v-model="form.genre"
-          type="radio"
-          name="post-genre"
-          :value="genre.label"
-        />
-        <label :for="`post_genre_${genre.value}`">{{ genre.label }}</label>
+
+    <RadioGroup
+      :model-value="form.genre"
+      class="flex flex-wrap justify-around gap-4"
+      @update:model-value="(v) => (form.genre = String(v ?? ''))"
+    >
+      <div v-for="genre in meta.genres" :key="genre.value" class="flex items-center gap-2">
+        <RadioGroupItem :id="`post_genre_${genre.value}`" :value="genre.label" />
+        <Label :for="`post_genre_${genre.value}`" class="font-normal">{{ genre.label }}</Label>
       </div>
-    </div>
+    </RadioGroup>
 
     <MapPicker
       :initial-latitude="initialPost ? initialPost.latitude : null"
@@ -122,29 +126,26 @@ function submit() {
       @location-selected="onLocationSelected"
     />
 
-    <div class="form-floating mb-3">
-      <select id="post-prefecture" v-model="form.prefecture" class="form-select" @change="onPrefectureChange">
+    <div class="space-y-2">
+      <Label for="post-prefecture">都道府県</Label>
+      <select id="post-prefecture" v-model="form.prefecture" class="native-select" @change="onPrefectureChange">
         <option value=""></option>
         <option v-for="prefecture in meta.prefectures" :key="prefecture.value" :value="prefecture.label">{{ prefecture.label }}</option>
       </select>
-      <label for="post-prefecture">都道府県</label>
     </div>
 
-    <div class="form-group mb-3">
-      <label for="post-photos">写真</label>
-      <span>(4枚まで)</span>
-      <div v-if="initialPost && initialPost.photos.length" class="row g-2 mb-2">
-        <img v-for="photo in initialPost.photos" :key="photo.url" :src="photo.thumb_url" width="48%" class="col-md-6" alt="投稿写真" />
+    <div class="space-y-2">
+      <Label for="post-photos">写真 <span class="text-muted-foreground font-normal">(4枚まで)</span></Label>
+      <div v-if="initialPost && initialPost.photos.length" class="grid grid-cols-2 gap-2">
+        <img v-for="photo in initialPost.photos" :key="photo.url" :src="photo.thumb_url" class="w-full rounded-md" alt="投稿写真" />
       </div>
-      <div class="input-group form-file mb-3">
-        <input id="post-photos" type="file" class="form-control" multiple accept="image/png,image/jpeg" @change="onFilesChange" />
-      </div>
+      <Input id="post-photos" type="file" multiple accept="image/png,image/jpeg" @change="onFilesChange" />
     </div>
 
-    <div class="actions d-flex justify-content-center">
-      <button :id="mode === 'new' ? 'create-post' : 'update-post'" type="submit" class="btn btn-primary" :disabled="submitting">
+    <div class="actions flex justify-center">
+      <Button :id="mode === 'new' ? 'create-post' : 'update-post'" type="submit" :disabled="submitting">
         {{ mode === 'new' ? '登録する' : '更新する' }}
-      </button>
+      </Button>
     </div>
   </form>
 </template>
