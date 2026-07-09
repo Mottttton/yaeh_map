@@ -1,15 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { useMetaStore } from '../stores/meta'
 import { accountsApi } from '../api'
+import { extractErrors } from '../api/errors'
 import PortraitIcon from '../components/PortraitIcon.vue'
 
-const props = defineProps({
-  id: { type: String, required: true }
-})
+const props = defineProps<{ id: string }>()
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -17,9 +21,9 @@ const flash = useFlashStore()
 const meta = useMetaStore()
 
 const form = reactive({ nickname: '', region: '', self_introduction: '' })
-const portraitUrl = ref(null)
-const portraitFile = ref(null)
-const errors = ref([])
+const portraitUrl = ref<string | null>(null)
+const portraitFile = ref<File | null>(null)
+const errors = ref<string[]>([])
 const submitting = ref(false)
 
 onMounted(async () => {
@@ -36,8 +40,9 @@ onMounted(async () => {
   portraitUrl.value = data.account.portrait_url
 })
 
-function onPortraitChange(event) {
-  portraitFile.value = event.target.files[0] || null
+function onPortraitChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  portraitFile.value = input.files?.[0] || null
 }
 
 async function updateProfile() {
@@ -53,7 +58,7 @@ async function updateProfile() {
     flash.notice(data.message)
     router.push({ name: 'account-show', params: { id: props.id } })
   } catch (error) {
-    errors.value = error.response?.data?.errors || ['更新に失敗しました']
+    errors.value = extractErrors(error, '更新に失敗しました')
   } finally {
     submitting.value = false
   }
@@ -61,46 +66,48 @@ async function updateProfile() {
 </script>
 
 <template>
-  <div class="container mt-5">
-    <h1>プロフィール編集</h1>
-    <div v-if="errors.length" class="alert alert-danger" role="alert">
-      <ul class="mb-0">
-        <li v-for="error in errors" :key="error">{{ error }}</li>
-      </ul>
-    </div>
-    <form @submit.prevent="updateProfile">
-      <div class="form-group mb-3">
+  <div class="mx-auto mt-10 w-full max-w-xl px-4">
+    <h1 class="mb-4 text-3xl font-bold">プロフィール編集</h1>
+    <Alert v-if="errors.length" variant="destructive" role="alert" class="mb-4">
+      <AlertDescription>
+        <ul class="list-disc pl-4">
+          <li v-for="error in errors" :key="error">{{ error }}</li>
+        </ul>
+      </AlertDescription>
+    </Alert>
+    <form class="space-y-4" @submit.prevent="updateProfile">
+      <div class="space-y-2">
         <div>
           <PortraitIcon :url="portraitUrl" size="profile" />
         </div>
-        <label for="account-portrait">アイコン</label>
-        <div class="input-group form-file">
-          <input id="account-portrait" type="file" class="form-control form-control-sm" accept="image/png,image/jpeg" @change="onPortraitChange" />
-        </div>
+        <Label for="account-portrait">アイコン</Label>
+        <Input id="account-portrait" type="file" accept="image/png,image/jpeg" @change="onPortraitChange" />
       </div>
-      <div class="form-floating mb-3">
-        <input id="account-nickname" v-model="form.nickname" type="text" class="form-control" placeholder="ニックネーム" />
-        <label for="account-nickname">ニックネーム</label>
+      <div class="space-y-2">
+        <Label for="account-nickname">ニックネーム</Label>
+        <Input id="account-nickname" v-model="form.nickname" type="text" />
       </div>
-      <div class="form-floating mb-3">
-        <select id="account-region" v-model="form.region" class="form-select">
+      <div class="space-y-2">
+        <Label for="account-region">地域</Label>
+        <select id="account-region" v-model="form.region" class="native-select">
           <option value=""></option>
           <option v-for="region in meta.regions" :key="region.value" :value="region.label">{{ region.label }}</option>
         </select>
-        <label for="account-region">地域</label>
       </div>
-      <div class="form-floating mb-3">
-        <textarea id="account-self-introduction" v-model="form.self_introduction" class="form-control" placeholder="自己紹介" style="height: 250px;"></textarea>
-        <label for="account-self-introduction">自己紹介</label>
+      <div class="space-y-2">
+        <Label for="account-self-introduction">自己紹介</Label>
+        <Textarea id="account-self-introduction" v-model="form.self_introduction" class="h-62" />
       </div>
       <div class="actions">
-        <button id="update-profile" type="submit" class="btn btn-primary" :disabled="submitting">更新する</button>
+        <Button id="update-profile" type="submit" :disabled="submitting">更新する</Button>
       </div>
     </form>
-    <hr />
-    <div>
+    <hr class="my-6" />
+    <div class="space-y-2">
       <p>アカウント名、メールアドレス、パスワードの変更はこちら</p>
-      <router-link id="edit-credentials" :to="{ name: 'credentials' }" class="btn btn-outline-primary">変更</router-link>
+      <Button id="edit-credentials" as-child variant="outline">
+        <router-link :to="{ name: 'credentials' }">変更</router-link>
+      </Button>
     </div>
   </div>
 </template>

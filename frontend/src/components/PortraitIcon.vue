@@ -1,18 +1,28 @@
-<script setup>
-defineProps({
-  url: { type: String, default: null },
-  // 'timeline'(40px) | 'profile'(120px)
-  size: { type: String, default: 'timeline' }
-})
+<script setup lang="ts">
+import { CircleUserRoundIcon } from '@lucide/vue'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
+withDefaults(
+  defineProps<{
+    url?: string | null
+    // 'timeline'(40px) | 'profile'(120px)
+    size?: 'timeline' | 'profile'
+  }>(),
+  {
+    url: null,
+    size: 'timeline'
+  }
+)
 </script>
 
 <template>
-  <img
-    v-if="url"
-    :src="url"
-    :class="size === 'profile' ? 'profile-portrait' : 'timeline-portrait'"
-    class="rounded-circle"
-    alt="portrait"
-  />
-  <i v-else class="bi bi-person-circle" :class="size === 'profile' ? 'fs-1' : 'fs-2'"></i>
+  <Avatar class="align-middle" :class="size === 'profile' ? 'size-30' : 'size-10'">
+    <AvatarImage v-if="url" :src="url" alt="portrait" class="object-cover" />
+    <AvatarFallback class="bg-transparent">
+      <CircleUserRoundIcon
+        class="text-muted-foreground"
+        :class="size === 'profile' ? 'size-16' : 'size-8'"
+      />
+    </AvatarFallback>
+  </Avatar>
 </template>

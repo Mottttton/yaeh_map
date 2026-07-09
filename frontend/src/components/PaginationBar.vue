@@ -1,47 +1,50 @@
-<script setup>
-import { computed } from 'vue'
+<script setup lang="ts">
+import { ChevronLeftIcon, ChevronRightIcon } from '@lucide/vue'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationItem,
+  PaginationLast,
+  PaginationNext,
+  PaginationPrevious
+} from '@/components/ui/pagination'
+import type { PaginationMeta } from '../types'
 
-const props = defineProps({
-  // { current_page, total_pages, total_count, per_page }
-  meta: { type: Object, required: true }
-})
-const emit = defineEmits(['change'])
-
-const pages = computed(() => {
-  const current = props.meta.current_page
-  const total = props.meta.total_pages
-  const windowSize = 2
-  const result = []
-  for (let page = Math.max(1, current - windowSize); page <= Math.min(total, current + windowSize); page++) {
-    result.push(page)
-  }
-  return result
-})
-
-function goTo(page) {
-  if (page < 1 || page > props.meta.total_pages || page === props.meta.current_page) return
-  emit('change', page)
-}
+defineProps<{ meta: PaginationMeta }>()
+const emit = defineEmits<{ change: [page: number] }>()
 </script>
 
 <template>
-  <nav v-if="meta.total_pages > 1" aria-label="pagination">
-    <ul class="pagination">
-      <li class="page-item" :class="{ disabled: meta.current_page === 1 }">
-        <a class="page-link" href="#" @click.prevent="goTo(1)">&laquo; 最初</a>
-      </li>
-      <li class="page-item" :class="{ disabled: meta.current_page === 1 }">
-        <a class="page-link" href="#" @click.prevent="goTo(meta.current_page - 1)">&lsaquo; 前</a>
-      </li>
-      <li v-for="page in pages" :key="page" class="page-item" :class="{ active: page === meta.current_page }">
-        <a class="page-link" href="#" @click.prevent="goTo(page)">{{ page }}</a>
-      </li>
-      <li class="page-item" :class="{ disabled: meta.current_page === meta.total_pages }">
-        <a class="page-link" href="#" @click.prevent="goTo(meta.current_page + 1)">次 &rsaquo;</a>
-      </li>
-      <li class="page-item" :class="{ disabled: meta.current_page === meta.total_pages }">
-        <a class="page-link" href="#" @click.prevent="goTo(meta.total_pages)">最後 &raquo;</a>
-      </li>
-    </ul>
-  </nav>
+  <Pagination
+    v-if="meta.total_pages > 1"
+    v-slot="{ page }"
+    :total="meta.total_count"
+    :items-per-page="Math.max(meta.per_page, 1)"
+    :page="meta.current_page"
+    :sibling-count="2"
+    show-edges
+    aria-label="pagination"
+    @update:page="emit('change', $event)"
+  >
+    <PaginationContent v-slot="{ items }">
+      <PaginationFirst />
+      <PaginationPrevious>
+        <ChevronLeftIcon data-icon="inline-start" />
+        <span class="hidden sm:block">前</span>
+      </PaginationPrevious>
+      <template v-for="(item, index) in items" :key="index">
+        <PaginationItem v-if="item.type === 'page'" :value="item.value" :is-active="item.value === page">
+          {{ item.value }}
+        </PaginationItem>
+        <PaginationEllipsis v-else :index="index" />
+      </template>
+      <PaginationNext>
+        <span class="hidden sm:block">次</span>
+        <ChevronRightIcon data-icon="inline-end" />
+      </PaginationNext>
+      <PaginationLast />
+    </PaginationContent>
+  </Pagination>
 </template>

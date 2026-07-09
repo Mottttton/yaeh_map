@@ -1,17 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useFlashStore } from '../stores/flash'
 import { postsApi } from '../api'
+import { extractErrors } from '../api/errors'
 import PostForm from '../components/PostForm.vue'
 
 const router = useRouter()
 const flash = useFlashStore()
 
-const errors = ref([])
+const errors = ref<string[]>([])
 const submitting = ref(false)
 
-async function createPost(formData) {
+async function createPost(formData: FormData) {
   submitting.value = true
   errors.value = []
   try {
@@ -19,7 +21,7 @@ async function createPost(formData) {
     flash.notice(data.message)
     router.push({ name: 'posts' })
   } catch (error) {
-    errors.value = error.response?.data?.errors || ['情報の登録に失敗しました']
+    errors.value = extractErrors(error, '情報の登録に失敗しました')
     window.scrollTo({ top: 0 })
   } finally {
     submitting.value = false
@@ -28,14 +30,16 @@ async function createPost(formData) {
 </script>
 
 <template>
-  <div class="container mt-5">
-    <h1>情報登録</h1>
-    <div v-if="errors.length" class="alert alert-danger">
-      <h2 class="alert-heading">情報の登録に失敗しました</h2>
-      <ul>
-        <li v-for="error in errors" :key="error">{{ error }}</li>
-      </ul>
-    </div>
+  <div class="mx-auto mt-10 w-full max-w-2xl px-4">
+    <h1 class="mb-4 text-3xl font-bold">情報登録</h1>
+    <Alert v-if="errors.length" variant="destructive" role="alert" class="mb-4">
+      <AlertTitle>情報の登録に失敗しました</AlertTitle>
+      <AlertDescription>
+        <ul class="list-disc pl-4">
+          <li v-for="error in errors" :key="error">{{ error }}</li>
+        </ul>
+      </AlertDescription>
+    </Alert>
     <PostForm mode="new" :submitting="submitting" @submit="createPost" />
   </div>
 </template>

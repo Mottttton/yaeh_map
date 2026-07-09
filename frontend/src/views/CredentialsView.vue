@@ -1,9 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { authApi } from '../api'
+import { extractErrors } from '../api/errors'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -16,7 +22,7 @@ const form = reactive({
   password_confirmation: '',
   current_password: ''
 })
-const errors = ref([])
+const errors = ref<string[]>([])
 const submitting = ref(false)
 
 onMounted(() => {
@@ -33,7 +39,7 @@ async function updateCredentials() {
     flash.notice(data.message)
     router.push({ name: 'account-show', params: { id: data.account.id } })
   } catch (error) {
-    errors.value = error.response?.data?.errors || ['更新に失敗しました']
+    errors.value = extractErrors(error, '更新に失敗しました')
   } finally {
     submitting.value = false
   }
@@ -49,57 +55,56 @@ async function deleteAccount() {
 </script>
 
 <template>
-  <div class="container mt-5">
-    <h2>アカウント情報の変更</h2>
-    <div v-if="errors.length" class="alert alert-danger" role="alert">
-      <ul class="mb-0">
-        <li v-for="error in errors" :key="error">{{ error }}</li>
-      </ul>
-    </div>
-    <form @submit.prevent="updateCredentials">
-      <div class="form-floating mb-3">
-        <input id="credentials-name" v-model="form.name" type="text" class="form-control" placeholder="アカウント名" autocomplete="username" />
-        <label for="credentials-name">アカウント名</label>
-        <i>(半角英数字とアンダーバーで入力)</i>
+  <div class="mx-auto mt-10 w-full max-w-xl px-4">
+    <h2 class="mb-4 text-2xl font-semibold">アカウント情報の変更</h2>
+    <Alert v-if="errors.length" variant="destructive" role="alert" class="mb-4">
+      <AlertDescription>
+        <ul class="list-disc pl-4">
+          <li v-for="error in errors" :key="error">{{ error }}</li>
+        </ul>
+      </AlertDescription>
+    </Alert>
+    <form class="space-y-4" @submit.prevent="updateCredentials">
+      <div class="space-y-2">
+        <Label for="credentials-name">アカウント名</Label>
+        <Input id="credentials-name" v-model="form.name" type="text" autocomplete="username" />
+        <p class="text-muted-foreground text-sm italic">(半角英数字とアンダーバーで入力)</p>
       </div>
-      <div class="form-floating mb-3">
-        <input id="credentials-email" v-model="form.email" type="email" class="form-control" placeholder="メールアドレス" autocomplete="email" />
-        <label for="credentials-email">メールアドレス</label>
+      <div class="space-y-2">
+        <Label for="credentials-email">メールアドレス</Label>
+        <Input id="credentials-email" v-model="form.email" type="email" autocomplete="email" />
       </div>
-      <div class="mb-3">
-        <a
-          class="btn btn-outline-secondary"
-          data-bs-toggle="collapse"
-          href="#password-collapse"
-          role="button"
-          aria-expanded="false"
-          aria-controls="password-collapse"
-        >パスワードの変更</a>
-        <div class="collapse" id="password-collapse">
-          <i>(変更しない場合は空欄のままにしてください)</i>
-          <div class="form-floating mb-3">
-            <input id="credentials-password" v-model="form.password" type="password" class="form-control" placeholder="新規パスワード" autocomplete="new-password" />
-            <label for="credentials-password">新規パスワード</label>
-            <em>パスワードは6文字以上で入力してください</em>
+
+      <Collapsible>
+        <CollapsibleTrigger as-child>
+          <Button type="button" variant="outline">パスワードの変更</Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent id="password-collapse" class="space-y-4 pt-3">
+          <p class="text-muted-foreground text-sm italic">(変更しない場合は空欄のままにしてください)</p>
+          <div class="space-y-2">
+            <Label for="credentials-password">新規パスワード</Label>
+            <Input id="credentials-password" v-model="form.password" type="password" autocomplete="new-password" />
+            <p class="text-muted-foreground text-sm italic">パスワードは6文字以上で入力してください</p>
           </div>
-          <div class="form-floating mb-3">
-            <input id="credentials-password-confirmation" v-model="form.password_confirmation" type="password" class="form-control" placeholder="新規パスワード(確認)" autocomplete="new-password" />
-            <label for="credentials-password-confirmation">新規パスワード(確認)</label>
+          <div class="space-y-2">
+            <Label for="credentials-password-confirmation">新規パスワード(確認)</Label>
+            <Input id="credentials-password-confirmation" v-model="form.password_confirmation" type="password" autocomplete="new-password" />
           </div>
-        </div>
+        </CollapsibleContent>
+      </Collapsible>
+
+      <div class="space-y-2">
+        <Label for="credentials-current-password">現在のパスワード</Label>
+        <Input id="credentials-current-password" v-model="form.current_password" type="password" autocomplete="current-password" />
       </div>
-      <div class="form-floating mb-3">
-        <input id="credentials-current-password" v-model="form.current_password" type="password" class="form-control" placeholder="現在のパスワード" autocomplete="current-password" />
-        <label for="credentials-current-password">現在のパスワード</label>
-      </div>
-      <div class="actions mb-5 d-flex justify-content-evenly">
-        <button id="update-account" type="submit" class="btn btn-primary" :disabled="submitting">更新する</button>
-        <button type="button" class="btn btn-secondary" @click="router.back()">戻る</button>
+      <div class="actions mb-8 flex justify-evenly">
+        <Button id="update-account" type="submit" :disabled="submitting">更新する</Button>
+        <Button type="button" variant="secondary" @click="router.back()">戻る</Button>
       </div>
     </form>
-    <hr />
-    <div class="dropdown d-flex justify-content-center">
-      <button type="button" class="btn btn-outline-danger" @click="deleteAccount">アカウント削除</button>
+    <hr class="my-6" />
+    <div class="flex justify-center">
+      <Button type="button" variant="destructive" @click="deleteAccount">アカウント削除</Button>
     </div>
   </div>
 </template>
