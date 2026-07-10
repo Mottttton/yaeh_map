@@ -16,6 +16,9 @@ Rails.application.routes.draw do
       # enum 定義などフロントエンドと共有するメタ情報
       get "meta", to: "meta#show"
 
+      # 画像の二段階アップロード（blob 作成 → signed_id で添付確定。未確定分は DELETE で破棄）
+      resources :uploads, only: %i(create destroy), param: :signed_id
+
       resources :posts, only: %i(index show create update destroy) do
         resource :favorite, only: %i(create destroy), controller: "favorites"
       end

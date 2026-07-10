@@ -5,6 +5,15 @@ RSpec.describe 'Api::V1::Posts', type: :request do
   let!(:account) { create(:second_account) }         # region: 近畿(5), admin: false
   let!(:no_region_account) { create(:no_region_account) } # region 未設定
 
+  # uploads API 相当の未添付 blob を作成する（photo_signed_ids で添付を確定する前の状態）
+  def create_upload_blob
+    ActiveStorage::Blob.create_and_upload!(
+      io: File.open(Rails.root.join('spec/fixtures/files/test.png')),
+      filename: 'test.png',
+      content_type: 'image/png'
+    )
+  end
+
   describe 'GET /api/v1/posts' do
     it '未ログインは 401 を返す' do
       get api_v1_posts_path
@@ -126,17 +135,24 @@ RSpec.describe 'Api::V1::Posts', type: :request do
       expect(response.parsed_body.dig('post', 'account', 'id')).to eq account.id
     end
 
-    it '写真を添付して投稿できる' do
+    it 'アップロード済みの signed_id を渡すと写真付きで投稿できる' do
       params = valid_params.deep_dup
-      params[:post][:photos] = [
-        Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/files/test.png'), 'image/png'),
-        Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/files/test.png'), 'image/png')
-      ]
+      params[:post][:photo_signed_ids] = [create_upload_blob.signed_id, create_upload_blob.signed_id]
       post api_v1_posts_path, params: params
       expect(response).to have_http_status(201)
       expect(Post.last.photos.count).to eq 2
       expect(response.parsed_body.dig('post', 'photos').size).to eq 2
       expect(response.parsed_body.dig('post', 'photos', 0, 'thumb_url')).to include '/rails/active_storage/'
+      expect(response.parsed_body.dig('post', 'photos', 0, 'signed_id')).to be_present
+    end
+
+    it '不正な signed_id は 422 を返す' do
+      params = valid_params.deep_dup
+      params[:post][:photo_signed_ids] = ['invalid-signed-id']
+      expect {
+        post api_v1_posts_path, params: params
+      }.not_to change(Post, :count)
+      expect(response).to have_http_status(422)
     end
 
     it 'バリデーションエラー時は 422 とエラーメッセージを返す' do
@@ -167,6 +183,44 @@ RSpec.describe 'Api::V1::Posts', type: :request do
       patch api_v1_post_path(post_record), params: { post: { title: '更新後タイトル' } }
       expect(response).to have_http_status(403)
       expect(post_record.reload.title).not_to eq '更新後タイトル'
+    end
+
+    describe '写真の編集（photo_signed_ids による全量置き換え）' do
+      before do
+        sign_in account
+        post_record.photos.attach([create_upload_blob, create_upload_blob])
+      end
+
+      it '残す写真の signed_id と新規アップロードの signed_id を送ると、含めなかった写真は削除される' do
+        keep_blob, remove_blob = post_record.photos.blobs.to_a
+        new_blob = create_upload_blob
+
+        patch api_v1_post_path(post_record), params: {
+          post: { photo_signed_ids: [keep_blob.signed_id, new_blob.signed_id] }
+        }, as: :json
+        expect(response).to have_http_status(200)
+        expect(post_record.reload.photos.blobs.map(&:id)).to contain_exactly(keep_blob.id, new_blob.id)
+        expect(ActiveStorage::Attachment.exists?(blob_id: remove_blob.id)).to be false
+      end
+
+      it '空配列を送ると写真をすべて削除できる' do
+        patch api_v1_post_path(post_record), params: { post: { photo_signed_ids: [] } }, as: :json
+        expect(response).to have_http_status(200)
+        expect(post_record.reload.photos.attached?).to be false
+      end
+
+      it 'photo_signed_ids を送らなければ写真は変更されない' do
+        patch api_v1_post_path(post_record), params: { post: { title: '写真そのまま' } }
+        expect(response).to have_http_status(200)
+        expect(post_record.reload.photos.count).to eq 2
+      end
+
+      it '5枚以上は 422 を返す' do
+        signed_ids = Array.new(5) { create_upload_blob.signed_id }
+        patch api_v1_post_path(post_record), params: { post: { photo_signed_ids: signed_ids } }, as: :json
+        expect(response).to have_http_status(422)
+        expect(post_record.reload.photos.count).to eq 2
+      end
     end
   end
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -9,8 +9,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { useMetaStore } from '../stores/meta'
-import { accountsApi } from '../api'
+import { accountsApi, uploadsApi, type AccountUpdatePayload } from '../api'
 import { extractErrors } from '../api/errors'
+import { usePendingUploadsGuard } from '../composables/usePendingUploads'
 import PortraitIcon from '../components/PortraitIcon.vue'
 
 const props = defineProps<{ id: string }>()
@@ -21,10 +22,29 @@ const flash = useFlashStore()
 const meta = useMetaStore()
 
 const form = reactive({ nickname: '', region: '', self_introduction: '' })
+// 保存済みのアイコン URL（サーバー上で確定しているもの）
 const portraitUrl = ref<string | null>(null)
-const portraitFile = ref<File | null>(null)
+// アップロード済み・未確定のアイコン（「更新する」で確定、離脱時は破棄）
+const pendingPortrait = ref<{ signedId: string; previewUrl: string } | null>(null)
+// 保存済みアイコンの削除予約（「更新する」で確定）
+const removeRequested = ref(false)
+const uploading = ref(false)
 const errors = ref<string[]>([])
 const submitting = ref(false)
+// file input をリセットするための key（同じファイルの選び直しにも対応）
+const portraitInputKey = ref(0)
+
+// プレビュー表示: 未確定アップロード > 削除予約(なし) > 保存済み
+const displayPortraitUrl = computed(() => {
+  if (pendingPortrait.value) return pendingPortrait.value.previewUrl
+  return removeRequested.value ? null : portraitUrl.value
+})
+
+usePendingUploadsGuard({
+  message: 'アップロードしたアイコンはまだ保存されていません。このページを離れると破棄されます。よろしいですか？',
+  pendingSignedIds: () => (pendingPortrait.value ? [pendingPortrait.value.signedId] : []),
+  onDiscard: () => clearPendingPortrait({ deleteBlob: false })
+})
 
 onMounted(async () => {
   // 他人のプロフィールは編集できない
@@ -40,21 +60,68 @@ onMounted(async () => {
   portraitUrl.value = data.account.portrait_url
 })
 
-function onPortraitChange(event: Event) {
+async function onPortraitChange(event: Event) {
   const input = event.target as HTMLInputElement
-  portraitFile.value = input.files?.[0] || null
+  const file = input.files?.[0]
+  if (!file) return
+  uploading.value = true
+  errors.value = []
+  try {
+    const { data } = await uploadsApi.create(file)
+    // 選び直した場合は前の未確定アップロードを破棄する
+    clearPendingPortrait({ deleteBlob: true })
+    pendingPortrait.value = { signedId: data.signed_id, previewUrl: URL.createObjectURL(file) }
+    removeRequested.value = false
+  } catch (error) {
+    errors.value = extractErrors(error, 'アイコンのアップロードに失敗しました')
+    portraitInputKey.value++
+  } finally {
+    uploading.value = false
+  }
+}
+
+// アイコンの「削除」ボタン。未確定アップロードがあれば取り消し、
+// なければ保存済みアイコンの削除を予約する（どちらも「更新する」までは確定しない）
+function removePortrait() {
+  if (pendingPortrait.value) {
+    clearPendingPortrait({ deleteBlob: true })
+  } else if (portraitUrl.value) {
+    removeRequested.value = true
+  }
+  portraitInputKey.value++
+}
+
+function clearPendingPortrait({ deleteBlob }: { deleteBlob: boolean }) {
+  if (!pendingPortrait.value) return
+  if (deleteBlob) {
+    void uploadsApi.destroy(pendingPortrait.value.signedId).catch(() => {})
+  }
+  URL.revokeObjectURL(pendingPortrait.value.previewUrl)
+  pendingPortrait.value = null
 }
 
 async function updateProfile() {
   submitting.value = true
   errors.value = []
-  const formData = new FormData()
-  formData.append('account[nickname]', form.nickname)
-  formData.append('account[region]', form.region)
-  formData.append('account[self_introduction]', form.self_introduction)
-  if (portraitFile.value) formData.append('account[portrait]', portraitFile.value)
+  const payload: AccountUpdatePayload = {
+    account: {
+      nickname: form.nickname,
+      region: form.region,
+      self_introduction: form.self_introduction
+    }
+  }
+  if (pendingPortrait.value) {
+    payload.account.portrait = pendingPortrait.value.signedId
+  } else if (removeRequested.value) {
+    payload.account.remove_portrait = true
+  }
   try {
-    const { data } = await accountsApi.update(props.id, formData)
+    const { data } = await accountsApi.update(props.id, payload)
+    // 保存が確定したので未確定扱いを解除する（離脱ガードを無効化。blob は添付済みなので削除しない）
+    clearPendingPortrait({ deleteBlob: false })
+    removeRequested.value = false
+    portraitUrl.value = data.account.portrait_url
+    await auth.fetchSession()
     flash.notice(data.message)
     router.push({ name: 'account-show', params: { id: props.id } })
   } catch (error) {
@@ -77,11 +144,35 @@ async function updateProfile() {
     </Alert>
     <form class="space-y-4" @submit.prevent="updateProfile">
       <div class="space-y-2">
-        <div>
-          <PortraitIcon :url="portraitUrl" size="profile" />
+        <div class="flex items-end gap-4">
+          <PortraitIcon :url="displayPortraitUrl" size="profile" />
+          <Button
+            v-if="displayPortraitUrl"
+            id="remove-portrait"
+            type="button"
+            variant="outline"
+            size="sm"
+            @click="removePortrait"
+          >
+            アイコンを削除
+          </Button>
         </div>
+        <p v-if="pendingPortrait" class="text-muted-foreground text-sm">
+          プレビュー表示中です。「更新する」を押すとアイコンが保存されます
+        </p>
+        <p v-else-if="removeRequested" class="text-muted-foreground text-sm">
+          「更新する」を押すとアイコンが削除されます
+        </p>
         <Label for="account-portrait">アイコン</Label>
-        <Input id="account-portrait" type="file" accept="image/png,image/jpeg" @change="onPortraitChange" />
+        <Input
+          id="account-portrait"
+          :key="portraitInputKey"
+          type="file"
+          accept="image/png,image/jpeg"
+          :disabled="uploading"
+          @change="onPortraitChange"
+        />
+        <p v-if="uploading" class="text-muted-foreground text-sm">アップロード中…</p>
       </div>
       <div class="space-y-2">
         <Label for="account-nickname">ニックネーム</Label>
@@ -99,7 +190,7 @@ async function updateProfile() {
         <Textarea id="account-self-introduction" v-model="form.self_introduction" class="h-62" />
       </div>
       <div class="actions">
-        <Button id="update-profile" type="submit" :disabled="submitting">更新する</Button>
+        <Button id="update-profile" type="submit" :disabled="submitting || uploading">更新する</Button>
       </div>
     </form>
     <hr class="my-6" />
