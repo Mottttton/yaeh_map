@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useFlashStore } from '../stores/flash'
-import { postsApi } from '../api'
+import { postsApi, type PostPayload } from '../api'
 import { extractErrors } from '../api/errors'
 import PostForm from '../components/PostForm.vue'
 import type { Post } from '../types'
@@ -13,6 +13,7 @@ const props = defineProps<{ id: string }>()
 const router = useRouter()
 const flash = useFlashStore()
 
+const postForm = ref<InstanceType<typeof PostForm> | null>(null)
 const post = ref<Post | null>(null)
 const errors = ref<string[]>([])
 const submitting = ref(false)
@@ -22,11 +23,13 @@ onMounted(async () => {
   post.value = data.post
 })
 
-async function updatePost(formData: FormData) {
+async function updatePost(payload: PostPayload) {
   submitting.value = true
   errors.value = []
   try {
-    const { data } = await postsApi.update(props.id, formData)
+    const { data } = await postsApi.update(props.id, payload)
+    // 更新が完了した時点で写真の追加・削除が確定する（離脱ガードを解除）
+    postForm.value?.markSaved()
     flash.notice(data.message)
     router.push({ name: 'post-show', params: { id: props.id } })
   } catch (error) {
@@ -49,6 +52,6 @@ async function updatePost(formData: FormData) {
         </ul>
       </AlertDescription>
     </Alert>
-    <PostForm v-if="post" mode="edit" :initial-post="post" :submitting="submitting" @submit="updatePost" />
+    <PostForm v-if="post" ref="postForm" mode="edit" :initial-post="post" :submitting="submitting" @submit="updatePost" />
   </div>
 </template>

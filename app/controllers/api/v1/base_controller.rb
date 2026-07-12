@@ -6,6 +6,11 @@ module Api
         render json: { errors: [exception.message] }, status: :unprocessable_entity
       end
 
+      # 添付ファイルの signed_id が不正（改ざん・期限切れなど）な場合を 422 で返す
+      rescue_from ActiveSupport::MessageVerifier::InvalidSignature do
+        render json: { errors: [I18n.t("uploads.invalid_signed_id")] }, status: :unprocessable_entity
+      end
+
       private
 
       def require_signin!

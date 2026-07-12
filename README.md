@@ -61,7 +61,7 @@ $ bundle exec rspec
 ~~~
 ## Docker での開発・実行
 ### ローカル開発環境（docker compose）
-db(PostgreSQL) / api(Rails) / web(Vite) の3コンテナが起動します。ソースコードはマウントされるため、編集は即座に反映されます（Vite の HMR も有効）。
+db(PostgreSQL) / api(Rails) / web(Vite) / storage(RustFS) の4コンテナが起動します。ソースコードはマウントされるため、編集は即座に反映されます（Vite の HMR も有効）。
 ~~~
 $ bin/docker-dev
 ~~~
@@ -74,6 +74,7 @@ $ API_PORT=3001 WEB_PORT=5273 docker compose up
 $ COMPOSE_PROJECT_NAME=yaeh_map2 bin/docker-dev
 ~~~
 - PostgreSQL のポートはホストに公開していないため、ホスト側の PostgreSQL とは競合しません。DB へ直接入る場合: `docker compose exec db psql -U postgres yaeh_map_development`
+- 画像等のアップロードは storage(RustFS, S3互換) に保存されます（本番の S3 相当）。バケットは api 起動時に `bin/rails storage:prepare` で自動作成され、配信は Rails の proxy 経由のためホストへのポート公開はありません
 - テストの実行: `docker compose exec api bundle exec rspec`
 - Gemfile 変更時: コンテナ再起動時に自動で `bundle install` されます（イメージを作り直す場合は `docker compose build api`）
 

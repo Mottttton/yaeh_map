@@ -56,8 +56,12 @@ module Api
         @post = Post.find(params[:id])
       end
 
+      # 写真は uploads API が払い出した signed_id の配列（photo_signed_ids）で受け取る。
+      # 全量置き換えのため、編集時は残す既存写真の signed_id も含めて送る（含めなかった写真は削除される）
       def post_params
-        params.require(:post).permit(:title, :region, :prefecture, :description, :genre, :place, :latitude, :longitude, photos: [])
+        permitted = params.require(:post).permit(:title, :region, :prefecture, :description, :genre, :place, :latitude, :longitude, photo_signed_ids: [])
+        permitted[:photos] = permitted.delete(:photo_signed_ids) if permitted.key?(:photo_signed_ids)
+        permitted
       end
 
       # 投稿の編集・削除は投稿者本人か管理者のみ

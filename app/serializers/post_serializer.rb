@@ -25,6 +25,8 @@ module PostSerializer
     # コントローラ外でも動くよう only_path を明示してプロキシ配信のパスを生成する
     helpers = Rails.application.routes.url_helpers
     {
+      # 編集時に「残す写真」を指定するための識別子（photo_signed_ids として送り返す）
+      signed_id: photo.blob.signed_id,
       url: helpers.rails_storage_proxy_path(photo, only_path: true),
       thumb_url: helpers.rails_storage_proxy_path(photo.variant(resize_to_limit: [400, 300]), only_path: true)
     }

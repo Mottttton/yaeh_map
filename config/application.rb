@@ -32,8 +32,9 @@ module YaehMap
     # 画像 URL をリダイレクトではなく Rails 経由のプロキシで配信する
     # （SPA から常に同一オリジンのパスで扱えるようにするため）
     config.active_storage.resolve_model_to_route = :rails_storage_proxy
-    # この開発機には libvips が無いため ImageMagick を使う
-    config.active_storage.variant_processor = :mini_magick
+    # 開発・本番のコンテナイメージ（Dockerfile / Dockerfile.dev）は libvips を同梱している
+    # （ImageMagick は入っていないため :mini_magick にはしないこと）
+    config.active_storage.variant_processor = :vips
 
     config.time_zone = "Asia/Tokyo"
     config.i18n.default_locale = :ja

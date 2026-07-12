@@ -55,16 +55,47 @@ export const metaApi = {
   fetch: () => client.get<MetaResponse>('/meta')
 }
 
+/** 二段階アップロード API のレスポンス。signed_id をフォーム送信に含めると添付が確定する */
+export interface UploadedBlob {
+  signed_id: string
+  url: string
+}
+
+export const uploadsApi = {
+  create: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return client.post<UploadedBlob>('/uploads', formData)
+  },
+  // 未確定（未添付）のアップロードを破棄する
+  destroy: (signedId: string) => client.delete<void>(`/uploads/${encodeURIComponent(signedId)}`)
+}
+
 export interface PostsIndexParams {
   page?: string | number
   q?: Record<string, unknown>
 }
 
+export interface PostPayload {
+  post: {
+    title: string
+    description: string
+    genre: string
+    region: string
+    prefecture: string
+    place: string
+    latitude: number | ''
+    longitude: number | ''
+    /** 投稿に残す写真の signed_id（全量置き換え。含めなかった既存写真は削除される） */
+    photo_signed_ids: string[]
+  }
+}
+
 export const postsApi = {
   index: (params: PostsIndexParams) => client.get<{ posts: Post[]; meta: PaginationMeta }>('/posts', { params }),
   show: (id: string | number) => client.get<{ post: Post }>(`/posts/${id}`),
-  create: (formData: FormData) => client.post<{ post: Post; message: string }>('/posts', formData),
-  update: (id: string | number, formData: FormData) => client.patch<{ post: Post; message: string }>(`/posts/${id}`, formData),
+  create: (payload: PostPayload) => client.post<{ post: Post; message: string }>('/posts', payload),
+  update: (id: string | number, payload: PostPayload) => client.patch<{ post: Post; message: string }>(`/posts/${id}`, payload),
   destroy: (id: string | number) => client.delete<MessageResponse>(`/posts/${id}`)
 }
 
@@ -73,11 +104,23 @@ export const favoritesApi = {
   destroy: (postId: number) => client.delete<FavoriteState>(`/posts/${postId}/favorite`)
 }
 
+export interface AccountUpdatePayload {
+  account: {
+    nickname: string
+    region: string
+    self_introduction: string
+    /** uploads API が払い出した signed_id。指定するとアイコンを差し替える */
+    portrait?: string
+    /** true でアイコンを削除する（portrait の指定がある場合はそちらを優先） */
+    remove_portrait?: boolean
+  }
+}
+
 export const accountsApi = {
   show: (id: string | number, params?: Record<string, unknown>) =>
     client.get<{ account: AccountProfile; posts: Post[]; meta: PaginationMeta }>(`/accounts/${id}`, { params }),
-  update: (id: string | number, formData: FormData) =>
-    client.patch<{ account: AccountProfile; message: string }>(`/accounts/${id}`, formData)
+  update: (id: string | number, payload: AccountUpdatePayload) =>
+    client.patch<{ account: AccountProfile; message: string }>(`/accounts/${id}`, payload)
 }
 
 export const adminApi = {
