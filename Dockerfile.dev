@@ -15,7 +15,7 @@ RUN apt-get update -qq && \
 
 # gem は named volume(/usr/local/bundle) にキャッシュされる。
 # ここでのインストール結果が初回起動時にボリュームへコピーされる。
-COPY Gemfile Gemfile.lock .ruby-version ./
+COPY backend/Gemfile backend/Gemfile.lock backend/.ruby-version ./
 RUN bundle install
 
 EXPOSE 3000
