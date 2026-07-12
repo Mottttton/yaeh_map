@@ -35,6 +35,8 @@ export interface AdminAccount {
 
 /** PostSerializer.photo_json */
 export interface PostPhoto {
+  /** 編集時に「残す写真」を指定するための識別子（photo_signed_ids として送り返す） */
+  signed_id: string
   url: string
   thumb_url: string
 }

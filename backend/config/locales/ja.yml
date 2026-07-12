@@ -183,6 +183,14 @@ ja:
   time:
     formats:
       default: "%Y/%m/%d %H:%M"
+  uploads:
+    invalid_signed_id: 画像のアップロード情報が不正です。もう一度アップロードしてください
+    create:
+      invalid_file: ファイルを指定してください
+      invalid_content_type: 画像はPNGまたはJPEG形式のみアップロードできます
+      too_large: ファイルサイズは10MB以下にしてください
+    destroy:
+      attached: 保存済みのファイルはこの操作では削除できません
   views:
     pagination:
       first: "&laquo; 最初"
