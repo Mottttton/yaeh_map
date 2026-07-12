@@ -23,8 +23,8 @@ export default defineConfig({
     }
   },
   build: {
-    // Rails の public/ へ出力し、Rails（または Nginx）がそのまま配信できるようにする
-    outDir: '../public',
+    // Rails の backend/public/ へ出力し、Rails（または Nginx）がそのまま配信できるようにする
+    outDir: '../backend/public',
     emptyOutDir: false
   }
 })

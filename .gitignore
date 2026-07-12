@@ -1,25 +1,25 @@
 # See https://help.github.com/articles/ignoring-files for more about ignoring files.
 
 # Ignore bundler config.
-/.bundle
+/backend/.bundle
 
 # Ignore all logfiles and tempfiles.
-/log/*
-/tmp/*
-!/log/.keep
-!/tmp/.keep
+/backend/log/*
+/backend/tmp/*
+!/backend/log/.keep
+!/backend/tmp/.keep
 
 # Ignore pidfiles, but keep the directory.
-/tmp/pids/*
-!/tmp/pids/
-!/tmp/pids/.keep
+/backend/tmp/pids/*
+!/backend/tmp/pids/
+!/backend/tmp/pids/.keep
 
 # Ignore uploaded files in development.
-/storage/*
-!/storage/.keep
+/backend/storage/*
+!/backend/storage/.keep
 
 # Ignore master key for decrypting credentials and more.
-/config/master.key
+/backend/config/master.key
 
 .env
 
@@ -28,9 +28,9 @@
 frontend/.env
 frontend/.env.local
 
-# Vite build output (frontend/ から public/ へ出力される)
-/public/index.html
-/public/assets
+# Vite build output (frontend/ から backend/public/ へ出力される)
+/backend/public/index.html
+/backend/public/assets
 
 .DS_Store
 /.serena

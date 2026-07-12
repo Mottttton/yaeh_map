@@ -54,7 +54,7 @@ services:
     ports:
       - "${API_PORT:-3000}:${API_PORT:-3000}"
     volumes:
-      - .:/app
+      - ./backend:/app
       - bundle:/usr/local/bundle
     depends_on:
       db:

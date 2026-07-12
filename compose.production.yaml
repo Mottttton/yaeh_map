@@ -2,7 +2,7 @@
 # 実際のデプロイ(ECS / Cloud Run 等)ではこのファイルは使わず、Dockerfile のイメージを直接使う。
 #
 # 起動:
-#   RAILS_MASTER_KEY="$(cat config/master.key)" docker compose -f compose.production.yaml up --build
+#   RAILS_MASTER_KEY="$(cat backend/config/master.key)" docker compose -f compose.production.yaml up --build
 #
 # 確認: http://localhost:${APP_PORT:-8080}
 # Google Maps を確認する場合は VITE_GOOGLE_MAPS_API_KEY も環境変数で渡す。

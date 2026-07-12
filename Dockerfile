@@ -4,7 +4,7 @@
 # ビルド:
 #   docker build --build-arg VITE_GOOGLE_MAPS_API_KEY=<APIキー> -t yaeh_map .
 # 起動:
-#   docker run -e RAILS_MASTER_KEY=<config/master.keyの値> -e DATABASE_URL=<接続URL> -p 3000:3000 yaeh_map
+#   docker run -e RAILS_MASTER_KEY=<backend/config/master.keyの値> -e DATABASE_URL=<接続URL> -p 3000:3000 yaeh_map
 #
 # Puma は PORT 環境変数を読むため、Cloud Run のようにポートが注入される環境でもそのまま動く。
 
@@ -39,15 +39,15 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-COPY Gemfile Gemfile.lock .ruby-version ./
+COPY backend/Gemfile backend/Gemfile.lock backend/.ruby-version ./
 RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
 
-COPY . .
+COPY backend/ .
 RUN bundle exec bootsnap precompile app/ lib/
 
 # ---------------------------------------------------------------------------
-# frontend: Vue(Vite) の本番ビルド。public/ に index.html と assets を出力する
+# frontend: Vue(Vite) の本番ビルド。backend/public/ に index.html と assets を出力する
 # ---------------------------------------------------------------------------
 FROM node:$NODE_VERSION-slim AS frontend
 
@@ -60,7 +60,8 @@ RUN npm ci --prefix frontend
 ARG VITE_GOOGLE_MAPS_API_KEY
 ENV VITE_GOOGLE_MAPS_API_KEY=$VITE_GOOGLE_MAPS_API_KEY
 
-COPY public ./public
+# リポジトリと同じ frontend/ ↔ backend/public の相対配置を再現する（Vite の outDir は ../backend/public）
+COPY backend/public ./backend/public
 COPY frontend ./frontend
 RUN npm run build --prefix frontend
 
@@ -71,7 +72,7 @@ FROM base
 
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
-COPY --from=frontend /app/public /rails/public
+COPY --from=frontend /app/backend/public /rails/public
 
 # 非 root ユーザーで実行する
 RUN groupadd --system --gid 1000 rails && \
