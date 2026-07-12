@@ -4,7 +4,6 @@
 /.gitignore
 /.vscode
 /.claude
-/.docs
 /.serena
 /.ruby-lsp
 .DS_Store
@@ -15,35 +14,34 @@
 /compose*.yaml
 
 # 秘密情報（RAILS_MASTER_KEY は実行時に環境変数で渡す）
-/config/master.key
-/config/credentials/*.key
+/backend/config/master.key
+/backend/config/credentials/*.key
 .env*
 /frontend/.env*
 
 # ログ・一時ファイル
-/log/*
-!/log/.keep
-/tmp/*
-!/tmp/pids
-/tmp/pids/*
-!/tmp/pids/.keep
+/backend/log/*
+!/backend/log/.keep
+/backend/tmp/*
+!/backend/tmp/pids
+/backend/tmp/pids/*
+!/backend/tmp/pids/.keep
 
 # 開発時にアップロードされたファイル
-/storage/*
-!/storage/.keep
+/backend/storage/*
+!/backend/storage/.keep
 
 # 依存パッケージ（イメージ内でインストールする）
-/.bundle
-/vendor/bundle
+/backend/.bundle
+/backend/vendor/bundle
 /frontend/node_modules
 
 # Vite のビルド成果物（イメージビルド時に再生成する）
-/public/index.html
-/public/assets
+/backend/public/index.html
+/backend/public/assets
 
 # テスト・ドキュメント
-/spec
-/test
+/backend/spec
 /docs
 /img
 /README.md
