@@ -22,34 +22,46 @@
 
 ### 2.1 ベーストークン（shadcn-vue 変数）
 
-定義場所: `frontend/src/styles/app.css`（`:root` と `.dark`、oklch）。現状は shadcn デフォルトの無彩色のまま。**ブランドカラー決定後に更新する。**
+定義場所: `frontend/src/styles/app.css`（`:root` と `.dark`、oklch）。ブランド基盤を確定済み（issue #111, 2026-07-18）。値はコードを参照（本表は役割と状態の記録）。
 
 | 変数 | 役割 | 状態 |
 | --- | --- | --- |
-| `--primary` / `--primary-foreground` | ブランドカラー。主要アクション | **TBD**（Claude Design Step 1） |
-| `--secondary` / `--accent` | 補助面・強調 | **TBD** |
+| `--primary` / `--primary-foreground` | ブランドカラー。主要アクション | **確定: Route Blue**（oklch hue 256。light `0.52 0.18` / dark `0.62 0.17`） |
+| `--secondary` / `--accent` / `--muted` | 補助面・強調 | **確定**（無彩色に hue 256 を僅かに含ませ統一） |
+| `--ring` | フォーカスリング | **確定**（ブランド色寄り `0.62 0.16 256`） |
 | `--destructive` | 破壊的操作（削除・退会） | 既定値を継続利用 |
-| `--background` / `--foreground` / `--card` / `--muted` / `--border` / `--ring` | 面・文字・境界 | 既定値ベースで微調整 **TBD** |
+| `--background` / `--foreground` / `--card` / `--border` / `--input` | 面・文字・境界 | 既定値を継続 |
 | `--radius` | 角丸（現在 0.625rem） | 継続（変更する場合は決定記録へ） |
 
-### 2.2 ドメイン・セマンティックトークン（新設・すべて TBD）
+### 2.2 ドメイン・セマンティックトークン
 
-Yaeh Map 固有の意味を持つ色。**トークン名は Post の genre enum のスラッグと揃える**（ユビキタス言語の一貫性。enum 拡張は #105、用語集は docs/glossary.md（#96 Step 1）と連動）。
+Yaeh Map 固有の意味を持つ色。**トークン名は Post の genre enum のスラッグと揃える**（ユビキタス言語の一貫性。enum 拡張は #105、用語集は docs/glossary.md（#96 Step 1）と連動）。app.css に定義済み（issue #111）。標識メタファーで **3 ファミリー**に分類し、色相=ファミリー、同一ファミリー内は chroma/lightness と lucide アイコンで区別する。`--genre-*` はすべて app.css の `:root`/`.dark` を参照。
 
-| トークン（案） | 意味 | 設計上の要件 |
-| --- | --- | --- |
-| `--genre-recommend` | オススメ | ポジティブ。ブランド系統色 |
-| `--genre-parking` | 駐輪場 | 中立・情報 |
-| `--genre-closed` | 通行止め | 警戒色ファミリー。最も強い |
-| `--genre-frozen` | 凍結 | 警戒色ファミリー |
-| `--genre-gravel` | 砂利・落石 | 警戒色ファミリー |
-| `--genre-construction` | 工事 | 警戒色ファミリー |
-| `--genre-winter` | 冬季閉鎖 | 警戒色ファミリー |
-| 鮮度の表現 | 新しい/古い/期限切れ | 色トークンにするか「退色・彩度低下ルール」にするかは Step 1 で決定 **TBD** |
-| 広告面の表現 | 広告/スポンサー枠 | 専用トークンにするか「ラベル+枠線ルール」にするかは Phase 2 画面デザイン時に決定 **TBD** |
+| トークン | 意味 | ファミリー | enum |
+| --- | --- | --- | --- |
+| `--genre-recommend` | オススメ | ポジティブ（案内グリーン） | 現行 |
+| `--genre-parking` | 駐輪場 | ポジティブ（案内ティール） | 現行 |
+| `--genre-caution` | 注意 | ネガティブ（警戒イエロー） | 現行 |
+| `--genre-gravel` | 砂利・落石 | ネガティブ（アンバー） | #105 |
+| `--genre-accident` | 事故 | ネガティブ（アンバーオレンジ） | #105 |
+| `--genre-construction` | 工事 | 警戒（レッドオレンジ） | #105 |
+| `--genre-closed` | 通行止め | 警戒（規制レッド・最強） | #105 |
+| `--genre-winter` | 冬季閉鎖 | 警戒（レッド） | #105 |
+| `--genre-frozen` | 凍結 | 警戒（ディープレッド） | #105 |
+| `--yaeh` / `--yaeh-foreground` | ヤエー（いいね）アクセント | amber-400（FavoriteButton のコード実態にアンカー） | 現行 |
+| 鮮度の表現 | 新しい/古い/期限切れ | — | 色トークン化 or 退色ルールは #105 で決定 **TBD** |
+| 広告面の表現 | 広告/スポンサー枠 | — | 専用トークン or ラベル+枠線は Phase 2 で決定 **TBD** |
 
-- 警戒色ファミリーは道路標識のメタファー（警戒=黄系 等）を基調に、ライト/ダーク両モードでコントラスト比を確保する
 - ジャンル色は必ず**アイコン（lucide）とペア**で使う（色覚多様性対応。色だけで意味を伝えない）
+- **文字色は単一の `--genre-foreground` 固定にしない**（#105 GenreBadge で対応）。コントラスト検証（下記）の結果、チップ地色ごとに白/黒を出し分ける必要がある。現状 `--genre-foreground` の既定は白だが、大半のジャンルは黒文字が必要。
+
+#### コントラスト検証結果（issue #111, WCAG 2.1、小サイズ文字=AA 4.5 目標）
+
+ソリッド地＋白/黒文字を前提に全ジャンル×ライト/ダークを検証。**地色ごとに最適な文字色（白/黒）を選べば**、屋外要件（原則 #5）に必要な水準に収まる:
+
+- ポジティブ（recommend/parking）とネガティブ（caution/gravel/accident）は**黒文字**が最適（白文字はダークモードで AA 未達。例: recommend 2.94 / parking 2.77 / accident 2.25）
+- 警戒（construction/closed/winter/frozen）は**白文字**が最適
+- 最適文字色でも AA 4.5 に僅かに届かない（AA-large 3.0〜4.5）のは recommend(light 4.39)・construction(light 4.49)・winter(dark 4.40)・frozen(dark 4.36) の 4 つ。いずれも 3.0 以上でグラフィカル要素としては許容範囲。厳密 AA を要する場合は #105 で当該地色の lightness を微調整する
 
 ### 2.3 タイポグラフィ・スペーシング
 
@@ -101,4 +113,5 @@ Yaeh Map 固有の意味を持つ色。**トークン名は Post の genre enum 
 | --- | --- | --- |
 | 2026-07-12 | 本書の骨子を作成。真実の源泉はコード、カタログは claude.ai/design、画面から育てる方針を採用 | 個人開発で保守コストを最小化しつつ、ジャンル/鮮度/広告の意味論的一貫性を担保するため |
 | 2026-07-18 | DesignSync（コンポーネント自動同期）は不採用。claude.ai/design はブリーフを渡して提案を得る場とし、採用分だけを手でコードへ反映する運用に変更（issue #111） | DesignSync は React 専用で、本アプリの UI は Vue（shadcn-vue / reka-ui）のため同期モデルに乗らない。React ミラーを別途持つのは §0「値の二重管理はしない」に反するため採らない |
+| 2026-07-18 | ブランド主要色を **Route Blue**（oklch hue 256）に確定。`--secondary`/`--muted`/`--accent` は hue 256 を僅かに含ませ統一。`--yaeh`(amber-400) と `--genre-*`（3 ファミリー・9 種）を app.css に新設（issue #111） | claude.ai/design プロジェクトの提案を採用。ジャンル色は道路標識メタファーで分類し、コントラスト検証（§2.2）で屋外要件を満たすことを確認。文字色の白/黒出し分けは #105 GenreBadge へ申し送り |
 | （以降、トークン確定・部品追加のたびに追記） | | |
