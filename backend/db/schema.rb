@@ -83,7 +83,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_000000) do
     t.datetime "updated_at", null: false
     t.float "latitude"
     t.float "longitude"
-    t.integer "location_accuracy", default: 0, null: false
+    t.integer "location_accuracy", default: 1, null: false
     t.index ["account_id"], name: "index_posts_on_account_id"
   end
 

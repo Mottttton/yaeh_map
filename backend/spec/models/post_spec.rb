@@ -37,7 +37,7 @@ RSpec.describe Post, type: :model do
 
     context '情報投稿の位置情報が空文字の場合' do
       it 'バリデーションに失敗する' do
-        post = first_account.posts.build(title: '凍結注意', region: 0, description: '札幌以北は全面凍結してそうです', genre: 2, place: '', latitude: 43.9719375, longitude: 142.1427344 )
+        post = first_account.posts.build(title: '凍結注意', region: 0, description: '札幌以北は全面凍結してそうです', genre: 2, location_accuracy: 'exact', place: '', latitude: 43.9719375, longitude: 142.1427344 )
         expect(post).to be_invalid
         expect(post.errors.full_messages).to eq ["位置情報を入力してください"]
       end
@@ -75,18 +75,26 @@ RSpec.describe Post, type: :model do
     end
 
     context '未指定の場合' do
-      it 'exact になり座標・place がそのまま保存される（後方互換）' do
+      it '安全側の approximate になり座標が丸められ place は保存されない' do
         post = first_account.posts.create!(attrs)
+        expect(post.location_accuracy).to eq 'approximate'
+        expect(post.latitude).to be_within(1e-9).of(43.97)
+        expect(post.longitude).to be_within(1e-9).of(142.14)
+        expect(post.place).to be_nil
+      end
+    end
+
+    context 'exact の場合' do
+      it '座標・place がそのまま保存される' do
+        post = first_account.posts.create!(attrs.merge(location_accuracy: 'exact'))
         expect(post.location_accuracy).to eq 'exact'
         expect(post.latitude).to eq 43.9719375
         expect(post.longitude).to eq 142.1427344
         expect(post.place).to eq 'X4CV+Q3H 幌加内町、北海道'
       end
-    end
 
-    context 'exact で place が無い場合' do
-      it 'バリデーションに失敗する' do
-        post = first_account.posts.build(attrs.merge(place: nil))
+      it 'place が無い場合はバリデーションに失敗する' do
+        post = first_account.posts.build(attrs.merge(location_accuracy: 'exact', place: nil))
         expect(post).to be_invalid
         expect(post.errors.full_messages).to eq ['位置情報を入力してください']
       end

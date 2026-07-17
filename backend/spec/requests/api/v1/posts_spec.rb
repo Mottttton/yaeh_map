@@ -166,10 +166,19 @@ RSpec.describe 'Api::V1::Posts', type: :request do
       expect(response).to have_http_status(422)
     end
 
-    it 'location_accuracy 未指定は exact として作成される（後方互換）' do
+    it 'location_accuracy 未指定は安全側の approximate として作成される' do
       post api_v1_posts_path, params: valid_params
       expect(response).to have_http_status(201)
-      expect(response.parsed_body.dig('post', 'location_accuracy')).to eq 'exact'
+      expect(response.parsed_body.dig('post', 'location_accuracy')).to eq 'approximate'
+      expect(response.parsed_body.dig('post', 'place')).to be_nil
+    end
+
+    it 'exact を指定すると座標・place がそのまま保存される' do
+      post api_v1_posts_path, params: { post: valid_params[:post].merge(location_accuracy: 'exact') }
+      expect(response).to have_http_status(201)
+      post_json = response.parsed_body['post']
+      expect(post_json['location_accuracy']).to eq 'exact'
+      expect(post_json['place']).to eq 'ChIJTESTPLACEID'
     end
 
     it 'おおまか投稿はレスポンスの座標が丸め済みで place が null になる' do

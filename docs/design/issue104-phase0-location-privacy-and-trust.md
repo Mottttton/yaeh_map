@@ -29,12 +29,13 @@ enum :location_accuracy, { exact: 0, approximate: 1, no_location: 2 }, prefix: t
 
 ```ruby
 add_column :posts, :location_accuracy, :integer, null: false, default: 0
+change_column_default :posts, :location_accuracy, from: 0, to: 1
 change_column_null :posts, :latitude,  true
 change_column_null :posts, :longitude, true
 change_column_null :posts, :place,     true  # おおまか/位置なしで place を保存しないため必須
 ```
 
-- `default: 0` により既存投稿は自動的に「正確」になる（バックフィル不要）
+- `default: 0` で追加することで既存投稿は「正確」にバックフィルされる。その後 default を `1`（approximate）へ変更し、**新規レコードの未指定時は安全側の「おおまか」**とする（PR #121 レビュー反映）
 - `place` の NOT NULL 解除は見落としやすいので注意（現 schema は `t.string "place", null: false`）
 
 ### 1.2 丸めアルゴリズム: グリッドスナップ 0.01 度
@@ -246,7 +247,7 @@ end
 
 ## 5. テスト方針
 
-- **既存への影響**: posts factory は default「exact」でそのまま valid。「location_accuracy 未指定＝正確」の互換性を request spec で明示的に固定。model spec の座標 presence 期待（nil でエラー）は条件付きに書き換え。E2E 用 ID は変更しない
+- **既存への影響**: posts factory は default「approximate」でそのまま valid（place はクリアされる）。「location_accuracy 未指定＝おおまか（安全側）」を request spec で明示的に固定。model spec の座標 presence 期待（nil でエラー）は条件付きに書き換え、place 必須のテストは exact を明示。E2E 用 ID は変更しない
 - **追加 spec**:
   - model: 丸めの決定論・冪等性、精度別の place / 座標クリア、条件付き presence、`visible` スコープ、Report の重複 / 自己通報バリデーション
   - request: 精度別 create / update（おおまかのレスポンス座標が丸め済みであること＝生座標非返却の回帰テスト）、uploads の EXIF 除去（ruby-vips でフィールド検査）、reports 作成系、admin reports / hide 系、非表示投稿の 404 / 一覧除外（owner / admin 例外含む）

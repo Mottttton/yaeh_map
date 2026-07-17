@@ -20,7 +20,8 @@ class Post < ApplicationRecord
     "駐輪場" => 1,
     "注意" => 2
   }
-  # none は Post.none（ActiveRecord の null relation）と衝突するため no_location とする
+  # none は Post.none（ActiveRecord の null relation）と衝突するため no_location とする。
+  # 未指定時のデフォルトは DB default（1 = approximate、安全側）。既存投稿は migration で exact にバックフィル済み
   enum :location_accuracy, { exact: 0, approximate: 1, no_location: 2 }, prefix: true
 
   # おおまか投稿の丸め幅（度）。緯度 ≈ 1.1km / 経度 ≈ 0.9km（北緯35度付近）
