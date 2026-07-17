@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_08_19_041720) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_18_000000) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "accounts", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -77,12 +77,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_19_041720) do
     t.integer "prefecture"
     t.text "description", null: false
     t.integer "genre", null: false
-    t.string "place", null: false
+    t.string "place"
     t.bigint "account_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.float "latitude", null: false
-    t.float "longitude", null: false
+    t.float "latitude"
+    t.float "longitude"
+    t.integer "location_accuracy", default: 0, null: false
     t.index ["account_id"], name: "index_posts_on_account_id"
   end
 

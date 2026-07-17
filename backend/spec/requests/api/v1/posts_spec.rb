@@ -165,6 +165,38 @@ RSpec.describe 'Api::V1::Posts', type: :request do
       post api_v1_posts_path, params: { post: valid_params[:post].merge(region: '鹿児島') }
       expect(response).to have_http_status(422)
     end
+
+    it 'location_accuracy 未指定は exact として作成される（後方互換）' do
+      post api_v1_posts_path, params: valid_params
+      expect(response).to have_http_status(201)
+      expect(response.parsed_body.dig('post', 'location_accuracy')).to eq 'exact'
+    end
+
+    it 'おおまか投稿はレスポンスの座標が丸め済みで place が null になる' do
+      params = { post: valid_params[:post].merge(location_accuracy: 'approximate', latitude: 35.681234, longitude: 139.764321) }
+      post api_v1_posts_path, params: params
+      expect(response).to have_http_status(201)
+      post_json = response.parsed_body['post']
+      expect(post_json['location_accuracy']).to eq 'approximate'
+      expect(post_json['latitude']).to be_within(1e-9).of(35.68)
+      expect(post_json['longitude']).to be_within(1e-9).of(139.76)
+      expect(post_json['place']).to be_nil
+    end
+
+    it '位置なし投稿は座標と place を送っても null で作成される' do
+      post api_v1_posts_path, params: { post: valid_params[:post].merge(location_accuracy: 'no_location') }
+      expect(response).to have_http_status(201)
+      post_json = response.parsed_body['post']
+      expect(post_json['location_accuracy']).to eq 'no_location'
+      expect(post_json['latitude']).to be_nil
+      expect(post_json['longitude']).to be_nil
+      expect(post_json['place']).to be_nil
+    end
+
+    it '不正な location_accuracy は 422 を返す' do
+      post api_v1_posts_path, params: { post: valid_params[:post].merge(location_accuracy: 'unknown') }
+      expect(response).to have_http_status(422)
+    end
   end
 
   describe 'PATCH /api/v1/posts/:id' do

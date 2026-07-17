@@ -13,6 +13,7 @@ module PostSerializer
       place: post.place,
       latitude: post.latitude,
       longitude: post.longitude,
+      location_accuracy: post.location_accuracy,
       created_at: post.created_at.iso8601,
       account: AccountSerializer.basic(post.account),
       photos: post.photos.map { |photo| photo_json(photo) },
