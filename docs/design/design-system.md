@@ -5,7 +5,7 @@
 ## 0. 運用ルール（ガバナンス）
 
 - **真実の源泉はコード**: トークンは `frontend/src/styles/app.css`、部品は `frontend/src/components/`。本書は決定の記録と一覧であり、値の二重管理はしない（値は原則コードを参照）
-- **claude.ai/design のプロジェクトはビジュアルカタログ**: 提案・検討・閲覧用。DesignSync で同期する。採用した提案だけがコードに反映される
+- **claude.ai/design は提案を得る場**: ブリーフを渡して提案（oklch パレット / Tailwind クラス例 / lucide アイコン名）を出させる。採用した提案だけを手で `app.css` / コンポーネントへ反映する。コンポーネントの自動同期は行わない（[claude-design-brief.md](./claude-design-brief.md) §7 の注記参照）
 - **画面から育てる**: Phase 2/3 用の部品を先回りして定義しない。実際に画面をデザインするときに抽出して昇格させる
 - **変更フロー**: Claude Design へ依頼（提案）→ 採用判断 → `app.css` / コンポーネント反映 → 本書の該当表と決定記録を更新
 
@@ -93,11 +93,12 @@ Yaeh Map 固有の意味を持つ色。**トークン名は Post の genre enum 
 
 - 依頼順序は [claude-design-brief.md](./claude-design-brief.md) §7（Step 1: ブランド基盤 → Step 2: コア画面 → Step 3: 収益系画面）
 - 出力形式の要求は同 §3（oklch / shadcn-vue 変数名 / Tailwind クラス / lucide アイコン名）
-- 成果物はコンポーネントカードとして claude.ai/design プロジェクトに保存し、DesignSync で取得 → コードへ確定 → 本書更新
+- 成果物（oklch パレット / Tailwind クラス例 / lucide アイコン名）を提案として受け取り → 採用分を手で `app.css` / コンポーネントへ反映 → 本書更新。コンポーネントの自動同期は行わない（理由は §5 決定記録 2026-07-18）
 
 ## 5. 決定記録（Decision Log)
 
 | 日付 | 決定 | 理由 |
 | --- | --- | --- |
 | 2026-07-12 | 本書の骨子を作成。真実の源泉はコード、カタログは claude.ai/design、画面から育てる方針を採用 | 個人開発で保守コストを最小化しつつ、ジャンル/鮮度/広告の意味論的一貫性を担保するため |
+| 2026-07-18 | DesignSync（コンポーネント自動同期）は不採用。claude.ai/design はブリーフを渡して提案を得る場とし、採用分だけを手でコードへ反映する運用に変更（issue #111） | DesignSync は React 専用で、本アプリの UI は Vue（shadcn-vue / reka-ui）のため同期モデルに乗らない。React ミラーを別途持つのは §0「値の二重管理はしない」に反するため採らない |
 | （以降、トークン確定・部品追加のたびに追記） | | |
