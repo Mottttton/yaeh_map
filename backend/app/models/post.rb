@@ -7,9 +7,10 @@ class Post < ApplicationRecord
   validates :region, presence: true
   validates :description, presence: true
   validates :genre, presence: true
-  validates :place, presence: true
-  validates :latitude, presence: true
-  validates :longitude, presence: true
+  # おおまか/位置なしでは apply_location_accuracy が place・座標をクリアするため精度別に必須条件を変える
+  validates :place, presence: true, if: :location_accuracy_exact?
+  validates :latitude, presence: true, unless: :location_accuracy_no_location?
+  validates :longitude, presence: true, unless: :location_accuracy_no_location?
   validates :account_id, presence: true
   validates :photos, limit: { max: 4 }, content_type: %i(png jpg jpeg)
   enum :region, Region::REGIONS
@@ -19,6 +20,15 @@ class Post < ApplicationRecord
     "駐輪場" => 1,
     "注意" => 2
   }
+  # none は Post.none（ActiveRecord の null relation）と衝突するため no_location とする。
+  # 未指定時のデフォルトは DB default（1 = approximate、安全側）。既存投稿は migration で exact にバックフィル済み
+  enum :location_accuracy, { exact: 0, approximate: 1, no_location: 2 }, prefix: true
+
+  # おおまか投稿の丸め幅（度）。緯度 ≈ 1.1km / 経度 ≈ 0.9km（北緯35度付近）
+  COARSE_GRID_STEP = 0.01
+
+  # モデル層で丸め・クリアすることで、書き込み経路によらず生座標が DB に保存されないことを保証する
+  before_validation :apply_location_accuracy
 
   scope :in_reverse_created_date_order, -> { order(created_at: "DESC") }
   scope :filter_by_region, ->(region) { where(region: region) }
@@ -30,5 +40,24 @@ class Post < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     ["account", "favorites", "photos_attachments", "photos_blobs", "tags"]
+  end
+
+  private
+
+  def apply_location_accuracy
+    if location_accuracy_approximate?
+      self.latitude = round_coordinate(latitude) if latitude
+      self.longitude = round_coordinate(longitude) if longitude
+      self.place = nil
+    elsif location_accuracy_no_location?
+      self.latitude = nil
+      self.longitude = nil
+      self.place = nil
+    end
+  end
+
+  # グリッドスナップ（冪等）: 再編集で座標が動かず、丸め済みの値しか API に現れない
+  def round_coordinate(value)
+    (value / COARSE_GRID_STEP).round * COARSE_GRID_STEP
   end
 end

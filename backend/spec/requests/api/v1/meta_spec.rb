@@ -11,6 +11,11 @@ RSpec.describe 'Api::V1::Meta', type: :request do
       expect(body['regions']).to include('label' => '九州', 'value' => 8)
       expect(body['prefectures'].size).to eq 47
       expect(body['genres'].map { |genre| genre['label'] }).to eq %w(オススメ 駐輪場 注意)
+      expect(body['location_accuracies']).to eq [
+        { 'label' => '正確', 'value' => 'exact' },
+        { 'label' => 'おおまか', 'value' => 'approximate' },
+        { 'label' => '位置なし', 'value' => 'no_location' }
+      ]
       # 九州の都道府県は「九州」地域に対応する（旧 JS では不正な「鹿児島」を返すバグがあった）
       expect(body['prefecture_to_region']['福岡']).to eq '九州'
       expect(body['prefecture_to_region']['東京']).to eq '関東'

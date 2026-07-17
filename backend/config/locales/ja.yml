@@ -35,6 +35,7 @@ ja:
         place: 位置情報
         latitude: 経度
         longitude: 緯度
+        location_accuracy: 位置精度
         photos: 写真
         created_at: 作成日時
         tag: タグ
@@ -92,6 +93,12 @@ ja:
       over_x_years:
         one:   "1年以上前"
         other: "%{count}年以上前"
+  enums:
+    post:
+      location_accuracy:
+        exact: 正確
+        approximate: おおまか
+        no_location: 位置なし
   errors:
     format: "%{attribute}%{message}"
     messages:
