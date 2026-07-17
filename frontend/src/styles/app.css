@@ -24,6 +24,26 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-yaeh: var(--yaeh);
+  --color-yaeh-foreground: var(--yaeh-foreground);
+  --color-genre-recommend: var(--genre-recommend);
+  --color-genre-recommend-foreground: var(--genre-recommend-foreground);
+  --color-genre-parking: var(--genre-parking);
+  --color-genre-parking-foreground: var(--genre-parking-foreground);
+  --color-genre-caution: var(--genre-caution);
+  --color-genre-caution-foreground: var(--genre-caution-foreground);
+  --color-genre-gravel: var(--genre-gravel);
+  --color-genre-gravel-foreground: var(--genre-gravel-foreground);
+  --color-genre-accident: var(--genre-accident);
+  --color-genre-accident-foreground: var(--genre-accident-foreground);
+  --color-genre-construction: var(--genre-construction);
+  --color-genre-construction-foreground: var(--genre-construction-foreground);
+  --color-genre-closed: var(--genre-closed);
+  --color-genre-closed-foreground: var(--genre-closed-foreground);
+  --color-genre-winter: var(--genre-winter);
+  --color-genre-winter-foreground: var(--genre-winter-foreground);
+  --color-genre-frozen: var(--genre-frozen);
+  --color-genre-frozen-foreground: var(--genre-frozen-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -51,24 +71,64 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --primary: oklch(0.52 0.18 256);            /* Route Blue — ブランド主要色 */
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.968 0.006 256);        /* 無彩色にブルーを僅かに含ませ統一感を出す */
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --muted: oklch(0.968 0.006 256);
+  --muted-foreground: oklch(0.556 0.008 256);
+  --accent: oklch(0.960 0.011 256);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(0.62 0.16 256);               /* ブランド色寄りのフォーカスリング */
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
+
+  /* ── ヤエー(いいね)アクセント。コード実態: FavoriteButton の Tailwind amber-400 ── */
+  --yaeh: oklch(0.828 0.189 84.429);            /* amber-400 */
+  --yaeh-foreground: oklch(0.279 0.077 45.635); /* amber-950 */
+
+  /* ── ジャンル/ドメイントークン(design-system.md §2.2) ──
+     情報の種類で3ファミリーに分類。色=ファミリーの色相、同一ファミリー内は
+     chroma/lightness と必須の lucide アイコンで区別する。標識準拠。
+       ポジティブ(共有)    → green / teal(案内標識)
+       ネガティブ(注意喚起)→ yellow → amber-orange(警戒標識)
+       警戒(規制・危険)    → red family(規制標識)
+     色だけで意味を伝えず、必ず lucide アイコンとペアで使う。
+     現行 enum は recommend/parking/caution の3種、他は #105 で追加予定の先行定義。
+     文字色は各ジャンルが自分の -foreground を持ち、light/.dark でモードごとに解決して
+     小サイズ文字の WCAG 2.1 AA(4.5:1)を満たす。届かない4色(recommend/construction/
+     winter/frozen)のみ色相・彩度を保ったまま lightness を最小限調整して到達。 */
+  --genre-ink-white: oklch(1 0 0);     /* 白インク */
+  --genre-ink-black: oklch(0.21 0 0);  /* 黒インク(near-black) */
+  /* ポジティブ(共有) — 案内 green/teal・黒文字 */
+  --genre-recommend: oklch(0.60 0.13 152);   /* オススメ(L 0.58→0.60: 黒文字 比4.76) */
+  --genre-recommend-foreground: var(--genre-ink-black);
+  --genre-parking: oklch(0.60 0.09 195);     /* 駐輪場(黒文字 比4.68) */
+  --genre-parking-foreground: var(--genre-ink-black);
+  /* ネガティブ(注意喚起) — 警戒 yellow→amber・黒文字 */
+  --genre-caution: oklch(0.82 0.16 85);      /* 注意(黒文字 比10.0) */
+  --genre-caution-foreground: var(--genre-ink-black);
+  --genre-gravel: oklch(0.78 0.16 68);       /* 砂利・落石(黒文字 比8.6) */
+  --genre-gravel-foreground: var(--genre-ink-black);
+  --genre-accident: oklch(0.74 0.17 52);     /* 事故(黒文字 比7.3) */
+  --genre-accident-foreground: var(--genre-ink-black);
+  /* 警戒(規制・危険) — red family */
+  --genre-construction: oklch(0.64 0.19 40); /* 工事(L 0.62→0.64: 黒文字 比4.86) */
+  --genre-construction-foreground: var(--genre-ink-black);
+  --genre-closed: oklch(0.53 0.22 27);       /* 通行止め — 規制レッド(最強・白文字 比5.83) */
+  --genre-closed-foreground: var(--genre-ink-white);
+  --genre-winter: oklch(0.57 0.20 20);       /* 冬季閉鎖(白文字 比4.97) */
+  --genre-winter-foreground: var(--genre-ink-white);
+  --genre-frozen: oklch(0.55 0.19 12);       /* 凍結 — ディープレッド(白文字 比5.37) */
+  --genre-frozen-foreground: var(--genre-ink-white);
+
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -86,23 +146,47 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --primary: oklch(0.62 0.17 256);            /* Route Blue — 暗面向けに明度を上げる */
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.276 0.012 256);        /* ブルー寄りの無彩色 */
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --muted: oklch(0.276 0.012 256);
+  --muted-foreground: oklch(0.708 0.010 256);
+  --accent: oklch(0.288 0.016 256);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.62 0.16 256);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+
+  /* ジャンルは暗面コントラスト確保のため僅かに明度を上げる(ファミリーは維持)。
+     文字色は :root の --genre-ink-* を継承。dark で AA 未達の winter/frozen のみ
+     lightness を下げて白文字 4.5 に到達(色相・彩度は不変)。
+     --yaeh も明暗共通のため :root からカスケードさせる。 */
+  --genre-recommend: oklch(0.66 0.13 152);   /* 黒文字 比6.06 */
+  --genre-recommend-foreground: var(--genre-ink-black);
+  --genre-parking: oklch(0.68 0.09 195);     /* 黒文字 比6.43 */
+  --genre-parking-foreground: var(--genre-ink-black);
+  --genre-caution: oklch(0.85 0.16 85);      /* 黒文字 比11.1 */
+  --genre-caution-foreground: var(--genre-ink-black);
+  --genre-gravel: oklch(0.80 0.16 68);       /* 黒文字 比9.15 */
+  --genre-gravel-foreground: var(--genre-ink-black);
+  --genre-accident: oklch(0.77 0.17 52);     /* 黒文字 比7.87 */
+  --genre-accident-foreground: var(--genre-ink-black);
+  --genre-construction: oklch(0.66 0.19 40); /* 黒文字 比5.29 */
+  --genre-construction-foreground: var(--genre-ink-black);
+  --genre-closed: oklch(0.58 0.22 27);       /* 白文字 比4.78 */
+  --genre-closed-foreground: var(--genre-ink-white);
+  --genre-winter: oklch(0.585 0.20 20);      /* 冬季閉鎖(L 0.62→0.585: 白文字 比4.63) */
+  --genre-winter-foreground: var(--genre-ink-white);
+  --genre-frozen: oklch(0.575 0.19 12);      /* 凍結(L 0.60→0.575: 白文字 比4.82) */
+  --genre-frozen-foreground: var(--genre-ink-white);
+
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
