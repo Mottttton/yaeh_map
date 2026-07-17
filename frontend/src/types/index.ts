@@ -49,9 +49,13 @@ export interface Post {
   genre: string
   region: string
   prefecture: string | null
-  place: string
-  latitude: number
-  longitude: number
+  /** おおまか / 位置なしの投稿では null（サーバ側で保存しない） */
+  place: string | null
+  /** 位置なしの投稿では null。おおまかは 0.01 度グリッドに丸め済み */
+  latitude: number | null
+  longitude: number | null
+  /** 位置精度（enum の英語キー: exact / approximate / no_location） */
+  location_accuracy: string
   created_at: string
   account: AccountBasic
   photos: PostPhoto[]
@@ -68,9 +72,9 @@ export interface PaginationMeta {
 }
 
 /** Api::V1::MetaController#show の選択肢（label: 表示名 / value: enum 値） */
-export interface MetaOption {
+export interface MetaOption<V = number> {
   label: string
-  value: number
+  value: V
 }
 
 /** Api::V1::MetaController#show */
@@ -78,6 +82,8 @@ export interface MetaResponse {
   regions: MetaOption[]
   prefectures: MetaOption[]
   genres: MetaOption[]
+  /** 新規 enum は英語キー運用のため value は文字列（例: { label: "正確", value: "exact" }） */
+  location_accuracies: MetaOption<string>[]
   prefecture_to_region: Record<string, string>
 }
 

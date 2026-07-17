@@ -34,9 +34,10 @@ interface PostFormState {
   genre: string
   prefecture: string
   region: string
+  location_accuracy: string
   place: string
-  latitude: number | ''
-  longitude: number | ''
+  latitude: number | null
+  longitude: number | null
 }
 
 // 表示中の写真。既存写真（保存済み）と新規アップロード（未確定）を1つのリストで扱い、
@@ -55,9 +56,10 @@ const form = reactive<PostFormState>({
   genre: '',
   prefecture: '',
   region: '',
+  location_accuracy: 'exact',
   place: '',
-  latitude: '',
-  longitude: ''
+  latitude: null,
+  longitude: null
 })
 const photos = ref<PhotoItem[]>([])
 const uploadErrors = ref<string[]>([])
@@ -94,7 +96,8 @@ onMounted(async () => {
     form.genre = props.initialPost.genre
     form.prefecture = props.initialPost.prefecture || ''
     form.region = props.initialPost.region
-    form.place = props.initialPost.place
+    form.location_accuracy = props.initialPost.location_accuracy
+    form.place = props.initialPost.place || ''
     form.latitude = props.initialPost.latitude
     form.longitude = props.initialPost.longitude
     photos.value = props.initialPost.photos.map((photo) => ({
@@ -104,6 +107,19 @@ onMounted(async () => {
     }))
   }
 })
+
+const isNoLocation = computed(() => form.location_accuracy === 'no_location')
+const isApproximate = computed(() => form.location_accuracy === 'approximate')
+
+// 「位置なし」に切り替えたら座標・place をクリアする（都道府県は地域表示に使うため残す）
+function onAccuracyChange(value: string) {
+  form.location_accuracy = value
+  if (value === 'no_location') {
+    form.latitude = null
+    form.longitude = null
+    form.place = ''
+  }
+}
 
 // 地図から位置が選択されたらフォームへ反映（旧 map_common.js の hidden フィールド入力に相当）
 function onLocationSelected(location: MapLocation) {
@@ -166,6 +182,7 @@ function submit() {
       genre: form.genre,
       region: form.region,
       prefecture: form.prefecture,
+      location_accuracy: form.location_accuracy,
       place: form.place,
       latitude: form.latitude,
       longitude: form.longitude,
@@ -205,10 +222,28 @@ defineExpose({ markSaved })
       </div>
     </RadioGroup>
 
+    <div class="space-y-2">
+      <Label>位置精度</Label>
+      <RadioGroup
+        :model-value="form.location_accuracy"
+        class="flex flex-wrap justify-around gap-4"
+        @update:model-value="(v) => onAccuracyChange(String(v ?? 'exact'))"
+      >
+        <div v-for="accuracy in meta.locationAccuracies" :key="accuracy.value" class="flex items-center gap-2">
+          <RadioGroupItem :id="`post_location_accuracy_${accuracy.value}`" :value="accuracy.value" />
+          <Label :for="`post_location_accuracy_${accuracy.value}`" class="font-normal">{{ accuracy.label }}</Label>
+        </div>
+      </RadioGroup>
+      <p v-if="isApproximate" class="text-muted-foreground text-sm">
+        地図のピン位置は約1km単位に丸めて保存・表示されます
+      </p>
+    </div>
+
     <MapPicker
       :initial-latitude="initialPost ? initialPost.latitude : null"
       :initial-longitude="initialPost ? initialPost.longitude : null"
       :emit-initial-location="mode === 'new'"
+      :disabled="isNoLocation"
       @location-selected="onLocationSelected"
     />
 

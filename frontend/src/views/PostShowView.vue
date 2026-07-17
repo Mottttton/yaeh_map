@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useAuthStore } from '../stores/auth'
 import { useFlashStore } from '../stores/flash'
 import { postsApi } from '../api'
-import { embedMapUrl, googleMapsLinkUrl } from '../utils/googleMaps'
+import { embedMapUrl, embedViewUrl, googleMapsLinkUrl } from '../utils/googleMaps'
 import { timeAgoInWords } from '../utils/timeAgo'
 import FavoriteButton from '../components/FavoriteButton.vue'
 import PortraitIcon from '../components/PortraitIcon.vue'
@@ -23,8 +23,20 @@ const post = ref<Post | null>(null)
 
 const isOwner = computed(() => !!post.value && auth.account?.id === post.value.account.id)
 const canModerate = computed(() => isOwner.value || auth.isAdmin)
-const embedUrl = computed(() => (post.value ? embedMapUrl(post.value.place, post.value.latitude, post.value.longitude) : null))
-const externalMapUrl = computed(() => (post.value ? googleMapsLinkUrl(post.value.latitude, post.value.longitude) : ''))
+const isApproximate = computed(() => post.value?.location_accuracy === 'approximate')
+// 位置なし（座標 null）は地図セクション自体を表示しない
+const hasLocation = computed(() => post.value != null && post.value.latitude != null && post.value.longitude != null)
+// おおまかは place_id を持たないため view モード（丸め座標のみ）で表示する
+const embedUrl = computed(() => {
+  if (!post.value || post.value.latitude == null || post.value.longitude == null) return null
+  if (isApproximate.value) return embedViewUrl(post.value.latitude, post.value.longitude)
+  return post.value.place ? embedMapUrl(post.value.place, post.value.latitude, post.value.longitude) : null
+})
+const externalMapUrl = computed(() =>
+  post.value && post.value.latitude != null && post.value.longitude != null
+    ? googleMapsLinkUrl(post.value.latitude, post.value.longitude)
+    : ''
+)
 
 onMounted(async () => {
   const { data } = await postsApi.show(props.id)
@@ -56,6 +68,7 @@ async function destroyPost() {
         <Badge>{{ post.genre }}</Badge>
         <Badge>{{ post.region }}</Badge>
         <Badge v-if="post.prefecture">{{ post.prefecture }}</Badge>
+        <Badge v-if="isApproximate" variant="secondary">おおまか</Badge>
       </div>
       <small class="text-muted-foreground">{{ timeAgoInWords(post.created_at) }}</small>
     </div>
@@ -85,19 +98,24 @@ async function destroyPost() {
       <p class="text-justify wrap-break-word whitespace-pre-wrap">{{ post.description }}</p>
     </div>
 
-    <div v-if="embedUrl" class="relative mb-4 h-[65vh] w-full overflow-hidden rounded-md">
-      <iframe
-        class="absolute inset-0 h-full w-full border-0"
-        referrerpolicy="no-referrer-when-downgrade"
-        :src="embedUrl"
-        allowfullscreen
-      ></iframe>
-    </div>
-    <div v-else class="mb-4">
-      <a :href="externalMapUrl" target="_blank" rel="noopener" class="text-primary inline-flex items-center gap-1 hover:underline">
-        <MapPinIcon class="size-4" /> Google マップで場所を確認する
-      </a>
-    </div>
+    <template v-if="hasLocation">
+      <p v-if="isApproximate" class="text-muted-foreground mb-2 text-sm">
+        位置情報は約1km単位に丸めて表示しています
+      </p>
+      <div v-if="embedUrl" class="relative mb-4 h-[65vh] w-full overflow-hidden rounded-md">
+        <iframe
+          class="absolute inset-0 h-full w-full border-0"
+          referrerpolicy="no-referrer-when-downgrade"
+          :src="embedUrl"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <div v-else class="mb-4">
+        <a :href="externalMapUrl" target="_blank" rel="noopener" class="text-primary inline-flex items-center gap-1 hover:underline">
+          <MapPinIcon class="size-4" /> Google マップで場所を確認する
+        </a>
+      </div>
+    </template>
 
     <div class="flex justify-evenly">
       <template v-if="canModerate">

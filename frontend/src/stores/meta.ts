@@ -8,6 +8,7 @@ export const useMetaStore = defineStore('meta', {
     regions: [] as MetaOption[],
     prefectures: [] as MetaOption[],
     genres: [] as MetaOption[],
+    locationAccuracies: [] as MetaOption<string>[],
     prefectureToRegion: {} as Record<string, string>,
     loaded: false
   }),
@@ -18,6 +19,7 @@ export const useMetaStore = defineStore('meta', {
       this.regions = data.regions
       this.prefectures = data.prefectures
       this.genres = data.genres
+      this.locationAccuracies = data.location_accuracies
       this.prefectureToRegion = data.prefecture_to_region
       this.loaded = true
     }

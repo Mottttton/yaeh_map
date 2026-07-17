@@ -42,6 +42,12 @@ export function embedMapUrl(placeId: string, latitude: number, longitude: number
   return `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=place_id:${placeId}&center=${latitude},${longitude}&zoom=${zoom}`
 }
 
+// place_id を持たない「おおまか」投稿用の Embed API（view モード）の iframe URL
+export function embedViewUrl(latitude: number, longitude: number, zoom = 14): string | null {
+  if (!googleMapsApiKey) return null
+  return `https://www.google.com/maps/embed/v1/view?key=${googleMapsApiKey}&center=${latitude},${longitude}&zoom=${zoom}`
+}
+
 // キー無しでも使える Google マップへの外部リンク
 export function googleMapsLinkUrl(latitude: number, longitude: number): string {
   return `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
