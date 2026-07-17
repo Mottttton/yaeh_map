@@ -22,7 +22,13 @@ const flash = useFlashStore()
 
 const isOwner = computed(() => auth.account?.id === props.post.account.id)
 const canModerate = computed(() => isOwner.value || auth.isAdmin)
-const mapImage = computed(() => staticMapUrl(props.post.latitude, props.post.longitude))
+const isApproximate = computed(() => props.post.location_accuracy === 'approximate')
+// 位置なしは地図なし（MapPin フォールバック）。おおまかは丸め座標のため zoom を落として精度誤認を防ぐ
+const mapImage = computed(() =>
+  props.post.latitude != null && props.post.longitude != null
+    ? staticMapUrl(props.post.latitude, props.post.longitude, { zoom: isApproximate.value ? 13 : 16 })
+    : null
+)
 
 // いいねの状態は一覧・詳細で共有する post オブジェクトへ反映する
 function onFavoriteUpdated(state: FavoriteState) {
@@ -82,6 +88,7 @@ async function destroyPost() {
         <Badge>{{ post.genre }}</Badge>
         <Badge>{{ post.region }}</Badge>
         <Badge v-if="post.prefecture">{{ post.prefecture }}</Badge>
+        <Badge v-if="isApproximate" variant="secondary">おおまか</Badge>
       </div>
 
       <!-- 本文は高さを制限し、下端をぼかして「もっと見る」を重ねる -->

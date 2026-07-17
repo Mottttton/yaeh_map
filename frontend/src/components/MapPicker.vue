@@ -14,11 +14,14 @@ const props = withDefaults(
     initialLongitude?: number | null
     // 新規投稿では地図の初期位置（現在地）もフォームへ反映する（旧 map_new_post.js の挙動）
     emitInitialLocation?: boolean
+    // 「位置なし」選択時に地図のクリック・検索・現在地を無効化する
+    disabled?: boolean
   }>(),
   {
     initialLatitude: null,
     initialLongitude: null,
-    emitInitialLocation: false
+    emitInitialLocation: false,
+    disabled: false
   }
 )
 const emit = defineEmits<{ 'location-selected': [location: MapLocation] }>()
@@ -146,17 +149,27 @@ function searchLocation() {
     </div>
     <template v-if="mapAvailable">
       <div class="flex gap-2">
-        <Button type="button" id="current_location" variant="outline" @click="moveToCurrentLocation">現在地</Button>
+        <Button type="button" id="current_location" variant="outline" :disabled="disabled" @click="moveToCurrentLocation">現在地</Button>
         <Input
           id="placeSearch"
           v-model="searchWord"
           type="text"
           placeholder="場所を検索"
+          :disabled="disabled"
           @keydown.enter.prevent="searchLocation"
         />
-        <Button type="button" id="search-location-btn" variant="outline" @click="searchLocation">検索</Button>
+        <Button type="button" id="search-location-btn" variant="outline" :disabled="disabled" @click="searchLocation">検索</Button>
       </div>
-      <div id="map" ref="mapElement" class="h-100 w-full rounded-md"></div>
+      <div class="relative">
+        <div id="map" ref="mapElement" class="h-100 w-full rounded-md" :class="{ 'pointer-events-none': disabled }"></div>
+        <!-- overlay で地図を覆い、クリック不可であることを視覚的にも示す -->
+        <div
+          v-if="disabled"
+          class="bg-background/60 text-muted-foreground absolute inset-0 z-10 flex items-center justify-center rounded-md"
+        >
+          位置情報は保存されません
+        </div>
+      </div>
     </template>
     <Alert v-else>
       <AlertDescription>

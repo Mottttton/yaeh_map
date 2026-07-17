@@ -83,9 +83,12 @@ export interface PostPayload {
     genre: string
     region: string
     prefecture: string
+    /** 位置精度（enum の英語キー: exact / approximate / no_location） */
+    location_accuracy: string
     place: string
-    latitude: number | ''
-    longitude: number | ''
+    /** 位置なしでは null（おおまか / 位置なしのクリア・丸めはサーバ側でも強制される） */
+    latitude: number | null
+    longitude: number | null
     /** 投稿に残す写真の signed_id（全量置き換え。含めなかった既存写真は削除される） */
     photo_signed_ids: string[]
   }
