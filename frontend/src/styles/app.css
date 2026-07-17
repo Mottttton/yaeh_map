@@ -26,16 +26,24 @@
   --color-destructive: var(--destructive);
   --color-yaeh: var(--yaeh);
   --color-yaeh-foreground: var(--yaeh-foreground);
-  --color-genre-foreground: var(--genre-foreground);
   --color-genre-recommend: var(--genre-recommend);
+  --color-genre-recommend-foreground: var(--genre-recommend-foreground);
   --color-genre-parking: var(--genre-parking);
+  --color-genre-parking-foreground: var(--genre-parking-foreground);
   --color-genre-caution: var(--genre-caution);
+  --color-genre-caution-foreground: var(--genre-caution-foreground);
   --color-genre-gravel: var(--genre-gravel);
+  --color-genre-gravel-foreground: var(--genre-gravel-foreground);
   --color-genre-accident: var(--genre-accident);
+  --color-genre-accident-foreground: var(--genre-accident-foreground);
   --color-genre-construction: var(--genre-construction);
+  --color-genre-construction-foreground: var(--genre-construction-foreground);
   --color-genre-closed: var(--genre-closed);
+  --color-genre-closed-foreground: var(--genre-closed-foreground);
   --color-genre-winter: var(--genre-winter);
+  --color-genre-winter-foreground: var(--genre-winter-foreground);
   --color-genre-frozen: var(--genre-frozen);
+  --color-genre-frozen-foreground: var(--genre-frozen-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -88,28 +96,38 @@
 
   /* ── ジャンル/ドメイントークン(design-system.md §2.2) ──
      情報の種類で3ファミリーに分類。色=ファミリーの色相、同一ファミリー内は
-     chroma/lightness と必須の lucide アイコンで区別する。標識準拠で、
-     ポジティブ・警戒チップは白文字、注意喚起(黄)チップは黒文字。
+     chroma/lightness と必須の lucide アイコンで区別する。標識準拠。
        ポジティブ(共有)    → green / teal(案内標識)
        ネガティブ(注意喚起)→ yellow → amber-orange(警戒標識)
        警戒(規制・危険)    → red family(規制標識)
      色だけで意味を伝えず、必ず lucide アイコンとペアで使う。
-     現行 enum は recommend/parking/caution の3種、他は #105 で追加予定の先行定義。 */
-  --genre-fg-light: oklch(1 0 0);      /* 白文字 — ポジティブ・警戒チップ */
-  --genre-fg-dark: oklch(0.21 0 0);    /* 黒文字 — 注意喚起(黄)チップ */
-  /* ポジティブ(共有) */
-  --genre-recommend: oklch(0.58 0.13 152);   /* オススメ — 案内グリーン */
-  --genre-parking: oklch(0.60 0.09 195);     /* 駐輪場 — 案内ティール(ブルーから分離) */
-  /* ネガティブ(注意喚起) */
-  --genre-caution: oklch(0.82 0.16 85);      /* 注意 — 警戒イエロー */
-  --genre-gravel: oklch(0.78 0.16 68);       /* 砂利・落石 — アンバー */
-  --genre-accident: oklch(0.74 0.17 52);     /* 事故 — アンバーオレンジ */
-  /* 警戒(規制・危険) */
-  --genre-construction: oklch(0.62 0.19 40); /* 工事 — レッドオレンジ */
-  --genre-closed: oklch(0.53 0.22 27);       /* 通行止め — 規制レッド(最強) */
-  --genre-winter: oklch(0.57 0.20 20);       /* 冬季閉鎖 */
-  --genre-frozen: oklch(0.55 0.19 12);       /* 凍結 — ディープレッド(警戒ファミリー) */
-  --genre-foreground: var(--genre-fg-light); /* 後方互換のデフォルト */
+     現行 enum は recommend/parking/caution の3種、他は #105 で追加予定の先行定義。
+     文字色は各ジャンルが自分の -foreground を持ち、light/.dark でモードごとに解決して
+     小サイズ文字の WCAG 2.1 AA(4.5:1)を満たす。届かない4色(recommend/construction/
+     winter/frozen)のみ色相・彩度を保ったまま lightness を最小限調整して到達。 */
+  --genre-ink-white: oklch(1 0 0);     /* 白インク */
+  --genre-ink-black: oklch(0.21 0 0);  /* 黒インク(near-black) */
+  /* ポジティブ(共有) — 案内 green/teal・黒文字 */
+  --genre-recommend: oklch(0.60 0.13 152);   /* オススメ(L 0.58→0.60: 黒文字 比4.76) */
+  --genre-recommend-foreground: var(--genre-ink-black);
+  --genre-parking: oklch(0.60 0.09 195);     /* 駐輪場(黒文字 比4.68) */
+  --genre-parking-foreground: var(--genre-ink-black);
+  /* ネガティブ(注意喚起) — 警戒 yellow→amber・黒文字 */
+  --genre-caution: oklch(0.82 0.16 85);      /* 注意(黒文字 比10.0) */
+  --genre-caution-foreground: var(--genre-ink-black);
+  --genre-gravel: oklch(0.78 0.16 68);       /* 砂利・落石(黒文字 比8.6) */
+  --genre-gravel-foreground: var(--genre-ink-black);
+  --genre-accident: oklch(0.74 0.17 52);     /* 事故(黒文字 比7.3) */
+  --genre-accident-foreground: var(--genre-ink-black);
+  /* 警戒(規制・危険) — red family */
+  --genre-construction: oklch(0.64 0.19 40); /* 工事(L 0.62→0.64: 黒文字 比4.86) */
+  --genre-construction-foreground: var(--genre-ink-black);
+  --genre-closed: oklch(0.53 0.22 27);       /* 通行止め — 規制レッド(最強・白文字 比5.83) */
+  --genre-closed-foreground: var(--genre-ink-white);
+  --genre-winter: oklch(0.57 0.20 20);       /* 冬季閉鎖(白文字 比4.97) */
+  --genre-winter-foreground: var(--genre-ink-white);
+  --genre-frozen: oklch(0.55 0.19 12);       /* 凍結 — ディープレッド(白文字 比5.37) */
+  --genre-frozen-foreground: var(--genre-ink-white);
 
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -147,17 +165,27 @@
   --chart-5: oklch(0.269 0 0);
 
   /* ジャンルは暗面コントラスト確保のため僅かに明度を上げる(ファミリーは維持)。
-     --yaeh / --genre-fg-* は明暗共通のため :root からカスケードさせる。 */
-  --genre-recommend: oklch(0.66 0.13 152);
-  --genre-parking: oklch(0.68 0.09 195);
-  --genre-caution: oklch(0.85 0.16 85);
-  --genre-gravel: oklch(0.80 0.16 68);
-  --genre-accident: oklch(0.77 0.17 52);
-  --genre-construction: oklch(0.66 0.19 40);
-  --genre-closed: oklch(0.58 0.22 27);
-  --genre-winter: oklch(0.62 0.20 20);
-  --genre-frozen: oklch(0.60 0.19 12);
-  --genre-foreground: var(--genre-fg-light);
+     文字色は :root の --genre-ink-* を継承。dark で AA 未達の winter/frozen のみ
+     lightness を下げて白文字 4.5 に到達(色相・彩度は不変)。
+     --yaeh も明暗共通のため :root からカスケードさせる。 */
+  --genre-recommend: oklch(0.66 0.13 152);   /* 黒文字 比6.06 */
+  --genre-recommend-foreground: var(--genre-ink-black);
+  --genre-parking: oklch(0.68 0.09 195);     /* 黒文字 比6.43 */
+  --genre-parking-foreground: var(--genre-ink-black);
+  --genre-caution: oklch(0.85 0.16 85);      /* 黒文字 比11.1 */
+  --genre-caution-foreground: var(--genre-ink-black);
+  --genre-gravel: oklch(0.80 0.16 68);       /* 黒文字 比9.15 */
+  --genre-gravel-foreground: var(--genre-ink-black);
+  --genre-accident: oklch(0.77 0.17 52);     /* 黒文字 比7.87 */
+  --genre-accident-foreground: var(--genre-ink-black);
+  --genre-construction: oklch(0.66 0.19 40); /* 黒文字 比5.29 */
+  --genre-construction-foreground: var(--genre-ink-black);
+  --genre-closed: oklch(0.58 0.22 27);       /* 白文字 比4.78 */
+  --genre-closed-foreground: var(--genre-ink-white);
+  --genre-winter: oklch(0.585 0.20 20);      /* 冬季閉鎖(L 0.62→0.585: 白文字 比4.63) */
+  --genre-winter-foreground: var(--genre-ink-white);
+  --genre-frozen: oklch(0.575 0.19 12);      /* 凍結(L 0.60→0.575: 白文字 比4.82) */
+  --genre-frozen-foreground: var(--genre-ink-white);
 
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);

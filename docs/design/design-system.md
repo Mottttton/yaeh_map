@@ -53,15 +53,15 @@ Yaeh Map 固有の意味を持つ色。**トークン名は Post の genre enum 
 | 広告面の表現 | 広告/スポンサー枠 | — | 専用トークン or ラベル+枠線は Phase 2 で決定 **TBD** |
 
 - ジャンル色は必ず**アイコン（lucide）とペア**で使う（色覚多様性対応。色だけで意味を伝えない）
-- **文字色は単一の `--genre-foreground` 固定にしない**（#105 GenreBadge で対応）。コントラスト検証（下記）の結果、チップ地色ごとに白/黒を出し分ける必要がある。現状 `--genre-foreground` の既定は白だが、大半のジャンルは黒文字が必要。
+- **文字色は各ジャンルが自分の `--genre-<name>-foreground` を持つ**（`--genre-ink-white` / `--genre-ink-black` を参照）。ライト/ダークでモードごとに解決し、単一固定にはしない。
 
 #### コントラスト検証結果（issue #111, WCAG 2.1、小サイズ文字=AA 4.5 目標）
 
-ソリッド地＋白/黒文字を前提に全ジャンル×ライト/ダークを検証。**地色ごとに最適な文字色（白/黒）を選べば**、屋外要件（原則 #5）に必要な水準に収まる:
+全ジャンル×ライト/ダーク（計18ペア）が **AA 4.5:1 を達成**（屋外要件・原則 #5）:
 
-- ポジティブ（recommend/parking）とネガティブ（caution/gravel/accident）は**黒文字**が最適（白文字はダークモードで AA 未達。例: recommend 2.94 / parking 2.77 / accident 2.25）
-- 警戒（construction/closed/winter/frozen）は**白文字**が最適
-- 最適文字色でも AA 4.5 に僅かに届かない（AA-large 3.0〜4.5）のは recommend(light 4.39)・construction(light 4.49)・winter(dark 4.40)・frozen(dark 4.36) の 4 つ。いずれも 3.0 以上でグラフィカル要素としては許容範囲。厳密 AA を要する場合は #105 で当該地色の lightness を微調整する
+- ポジティブ（recommend/parking）とネガティブ（caution/gravel/accident）＋工事（construction）は**黒文字**
+- 警戒レッド系のうち closed/winter/frozen は**白文字**
+- 最適文字色でも 4.5 に届かなかった4色は色相・彩度を保ったまま lightness を微調整して到達: recommend `L0.58→0.60`、construction `L0.62→0.64`、winter(dark) `L0.62→0.585`、frozen(dark) `L0.60→0.575`
 
 ### 2.3 タイポグラフィ・スペーシング
 
